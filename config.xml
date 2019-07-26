@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<TEST>
+    <DRIVER>dm.jdbc.driver.DmDriver</DRIVER>
+    <URL>jdbc:dm://localhost:5236/SYSDBA</URL>
+    <SERVER>localhost</SERVER><!-- 必须存在，一般默认为localhost-->
+    <SERVERPATH>c:\dmdbms</SERVERPATH>
+    <DATABASE>SYSDBA</DATABASE>
+    <SCHEMA>SYSDBA</SCHEMA>
+    <UID>SYSDBA</UID><!--ORACLE改为SYSTEM-->
+    <PWD>SYSDBA</PWD>
+    <PORT>5236</PORT><!--oracle为1521、DM7为5236-->
+    <RANDOM>0</RANDOM><!--0:不随机执行，1：随机执行(随机执行自动为无限循环执行)-->
+    <THREADS>1</THREADS><!--有多少个线程来并行执行待测试的XML文件-->
+<!--    <DRIVER>dm.jdbc.driver.DmDriver</DRIVER>-->
+<!--    <URL>jdbc:dm://localhost:5236/SYSDBA</URL>-->
+<!--    <SERVER>localhost</SERVER>&lt;!&ndash; 必须存在，一般默认为localhost&ndash;&gt;-->
+<!--    <SERVERPATH>c:\dmdbms</SERVERPATH>-->
+<!--    <DATABASE>SYSDBA</DATABASE>-->
+<!--    <SCHEMA>SYSDBA</SCHEMA>-->
+<!--    <UID>SYSDBA</UID>&lt;!&ndash;ORACLE改为SYSTEM&ndash;&gt;-->
+<!--    <PWD>SYSDBA</PWD>-->
+<!--    <PORT>5236</PORT>&lt;!&ndash;oracle为1521、DM7为5236&ndash;&gt;-->
+<!--    <RANDOM>0</RANDOM>&lt;!&ndash;0:不随机执行，1：随机执行(随机执行自动为无限循环执行)&ndash;&gt;-->
+<!--    <THREADS>1</THREADS>&lt;!&ndash;有多少个线程来并行执行待测试的XML文件&ndash;&gt;-->
+    <FILEPATH>C:\Performance_00000_dm.xml c:\Performance_00002_dm.xml</FILEPATH><!--默认测试用例路径，用例路径之间用一个空格区分-->
+    <LOOP>0</LOOP>
+
+    <INFOLEVEL>2</INFOLEVEL><!--0:屏幕只显示文件名，1：显示文件名、错误信息，2：显示文件名、错误信息、所有SQL-->
+
+
+    <!-- 重启服务器插件相关 -->
+    <DMSERVERPLUGINSTARTPORT>54321</DMSERVERPLUGINSTARTPORT>
+    <TIMEINGTIME>2</TIMEINGTIME>
+    <DMSERVERPLUGINSTOPPORT>43210</DMSERVERPLUGINSTOPPORT>
+    <RESTARTTIME>3</RESTARTTIME>
+    <DMINITPLUGINSTOPPORT>11111</DMINITPLUGINSTOPPORT>
+    <!-- 此部分为其他服务器连接
+    <SERVER0>localhost</SERVER0>
+    <SERVER1>localhost</SERVER1>
+    <SERVER2>localhost</SERVER2>
+    <SERVER3>localhost</SERVER3>
+    <SERVER4>localhost</SERVER4>
+    <SERVER5>localhost</SERVER5>
+    <SERVER6>localhost</SERVER6>
+    <SERVER7>localhost</SERVER7>
+    <SERVER8>localhost</SERVER8>
+    <SERVER9>localhost</SERVER9>
+     -->
+    <!--
+    <PORT0>localhost</PORT0>
+    <PORT1>localhost</PORT1>
+    <PORT2>localhost</PORT2>
+    <PORT3>localhost</PORT3>
+    <PORT4>localhost</PORT4>
+    <PORT5>localhost</PORT5>
+    <PORT6>localhost</PORT6>
+    <PORT7>localhost</PORT7>
+    <PORT8>localhost</PORT8>
+    <PORT9>localhost</PORT9>
+     -->
+</TEST>
