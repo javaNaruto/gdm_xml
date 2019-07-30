@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<!--
+	修改记录列表
+	序号		修改类型		修改内容		修改人		修改日期
+	1		创建			创建文件		余俊美		2010-6-13	
+	2		修改			修改文件		刘静   		2011-11-30																
+-->
+<!--
+	测试点列表
+	1.集函数
+	2.decode函数	
+	3.数值函数	修改power pow pi to_char
+-->
+<SQLTEST>
+	<CONTENT>  </CONTENT><!-- 请在这里加入对脚本的简要描述 -->
+	<CONNECT></CONNECT><!-- 连接数据库 -->
+	<TestPointBegin> 测试点1：开始 </TestPointBegin>
+	<SQL_CASE>
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE><!-- 不关心语句执行的结果 -->
+		<SQL> drop table t1_insert0202 cascade; </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> create table t1_insert0202(c1 int); </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> insert into t1_insert0202 values(1); </SQL>
+		<SQL> insert into t1_insert0202 values(2); </SQL>
+
+		<TYPE> DIRECT_EXECUTE_FAIL </TYPE><!-- 预期执行失败 -->
+		<SQL> insert into t1_insert0202 values(sum(c1)); </SQL>
+		<SQL> insert into t1_insert0202 values(max(c1)); </SQL>
+		<SQL> insert into t1_insert0202 values(min(c1)); </SQL>
+		<SQL> insert into t1_insert0202 values(avg(c1)); </SQL>
+		<SQL> insert into t1_insert0202 values(count(c1)); </SQL>
+		<SQL> insert into t1_insert0202 values(distinct(c1)); </SQL>
+		<SQL> insert into t1_insert0202 values(all(c1)); </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL </TYPE><!-- 预期执行成功，并返回一个结果集，验证全字匹配长度 -->
+		<SQL> select * from t1_insert0202; </SQL>
+		<RESULT>
+			<RECORD>
+				<COLUMN>1</COLUMN>
+			</RECORD>
+			<RECORD>
+				<COLUMN>2</COLUMN>
+			</RECORD>
+		</RESULT>
+	</SQL_CASE>
+	
+	<TestPointBegin> 测试点2：开始 </TestPointBegin>
+	<SQL_CASE>
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE><!-- 不关心语句执行的结果 -->
+		<SQL> drop table t2_insert0202 cascade; </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> create table t2_insert0202(c1 int); </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> insert into t2_insert0202 values(decode(NULL,NULL,NULL,NULL,NULL)); </SQL>
+		<SQL> insert into t2_insert0202 values(decode(1,1,'1',2,'2')); </SQL>
+		<SQL> insert into t2_insert0202 values(decode(3,1,'1',2,'2')); </SQL>
+		<SQL> insert into t2_insert0202 values(decode(3,1,'1',2,'2','3')); </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL </TYPE><!-- 预期执行成功，并返回一个结果集，验证全字匹配长度 -->
+		<SQL> select * from t2_insert0202; </SQL>
+		<RESULT>
+			<RECORD>
+				<COLUMN>NULL</COLUMN>
+			</RECORD>
+			<RECORD>
+				<COLUMN>1</COLUMN>
+			</RECORD>
+			<RECORD>
+				<COLUMN>NULL</COLUMN>
+			</RECORD>
+			<RECORD>
+				<COLUMN>3</COLUMN>
+			</RECORD>
+		</RESULT>
+	</SQL_CASE>
+	
+	<TestPointBegin> 测试点3：开始 </TestPointBegin>
+	<SQL_CASE>
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE><!-- 不关心语句执行的结果 -->
+		<SQL> drop table t3_insert0202 cascade; </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> create table t3_insert0202(c1 int); </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> insert into t3_insert0202 values(1); </SQL>
+
+		<TYPE> DIRECT_EXECUTE_FAIL </TYPE><!-- 预期执行失败 -->
+		<SQL> insert into t3_insert0202 values(abs(c1)); </SQL>
+		<SQL> insert into t3_insert0202 values(acos(c1)); </SQL>
+		<SQL> insert into t3_insert0202 values(asin(c1)); </SQL>
+		<SQL> insert into t3_insert0202 values(atan(c1)); </SQL>
+		<SQL> insert into t3_insert0202 values(atan2(c1)); </SQL>
+		<SQL> insert into t3_insert0202 values(ceil(c1)); </SQL>
+		<SQL> insert into t3_insert0202 values(ceiling(c1)); </SQL>
+		<SQL> insert into t3_insert0202 values(cos(c1)); </SQL>
+		<SQL> insert into t3_insert0202 values(cosh(c1)); </SQL>
+		<SQL> insert into t3_insert0202 values(cot(c1)); </SQL>
+		<SQL> insert into t3_insert0202 values(degrees(c1)); </SQL>
+		<SQL> insert into t3_insert0202 values(exp(c1)); </SQL>
+		<SQL> insert into t3_insert0202 values(floor(c1)); </SQL>
+		<SQL> insert into t3_insert0202 values(greatest(c1)); </SQL>
+		<SQL> insert into t3_insert0202 values(least(c1)); </SQL>
+		<SQL> insert into t3_insert0202 values(ln(c1)); </SQL>
+		<SQL> insert into t3_insert0202 values(log(c1)); </SQL>
+		<SQL> insert into t3_insert0202 values(log10(c1)); </SQL>
+		<SQL> insert into t3_insert0202 values(mod(c1)); </SQL>
+		<SQL> insert into t3_insert0202 values(PI(c1)); </SQL>
+		<SQL> insert into t3_insert0202 values(POWER(c1,c1)); </SQL>
+		<SQL> insert into t3_insert0202 values(radians(c1)); </SQL>
+		<SQL> insert into t3_insert0202 values(rand(c1)); </SQL>
+		<SQL> insert into t3_insert0202 values(round(c1)); </SQL>
+		<SQL> insert into t3_insert0202 values(sign(c1)); </SQL>
+		<SQL> insert into t3_insert0202 values(sin(c1)); </SQL>
+		<SQL> insert into t3_insert0202 values(sinh(c1)); </SQL>
+		<SQL> insert into t3_insert0202 values(sqrt(c1)); </SQL>
+		<SQL> insert into t3_insert0202 values(tan(c1)); </SQL>
+		<SQL> insert into t3_insert0202 values(tanh(c1)); </SQL>
+		<SQL> insert into t3_insert0202 values(to_number(c1)); </SQL>
+		<SQL> insert into t3_insert0202 values(truc(c1)); </SQL>
+		<SQL> insert into t3_insert0202 values(truncate(c1)); </SQL>
+	  <SQL> insert into t3_insert0202 values(to_char(c1)); </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL </TYPE><!-- 预期执行成功，并返回一个结果集，验证全字匹配长度 -->
+		<SQL> select * from t3_insert0202; </SQL>
+		<RESULT>
+			<RECORD>
+				<COLUMN>1</COLUMN>
+			</RECORD>
+		</RESULT>
+	</SQL_CASE>
+	<CLEAR><!-- 脚本清除模块，该关键字标识清除块开始 -->
+		<SQL_CASE>
+			<SQL> drop table t1_insert0202 cascade; </SQL>
+			<SQL> drop table t2_insert0202 cascade; </SQL>
+		</SQL_CASE>
+	</CLEAR>
+</SQLTEST> 

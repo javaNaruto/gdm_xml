@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<!--
+	修改记录列表
+	序号		修改类型		修改内容		修改人		修改日期
+	1								孙峰		2005/05/09						
+-->
+<!--
+	测试点列表
+	1．空结果集过程
+	2．单个结果集过程
+	3．多个结果集过程
+	4. 带结果集的函数	
+-->
+<SQLTEST>
+	<CONTENT> 插入存贮过程生成的结果集 </CONTENT><!-- 请在这里加入对脚本的简要描述 -->
+	<CONNECT></CONNECT><!-- 连接数据库 -->
+	<SQL_CASE>
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE><!-- 不关心语句执行的结果 -->
+		<SQL> DROP TABLE DML_10025_TEMP CASCADE; </SQL>
+	</SQL_CASE>
+	<SQL_CASE>
+		<SQL> CREATE TABLE DML_10025_TEMP(C0 INT, C1 VARCHAR(100)) </SQL>
+		<SQL> INSERT INTO DML_10025_TEMP VALUES(1, &apos;ABCDEFG&apos;) </SQL>
+		<SQL> INSERT INTO DML_10025_TEMP VALUES(2, &apos;ABCDEFG&apos;) </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_FAIL </TYPE><!-- 预期执行失败 -->
+		<SQL> CREATE OR REPLACE FUNCTION DML_10025_FUN RETURN INT 
+			AS 
+			S1 INT; 
+			BEGIN 
+			S1:=2147483647;
+			SELECT * FROM DML_10025_TEMP WHERE C0 = 1;
+			RETURN S1; 
+			END; </SQL>
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> CREATE OR REPLACE PROCEDURE DML_10025_PRO_0
+			AS 			
+			BEGIN 
+			NULL; 
+			END; </SQL><!-- 空结果集 -->
+		<SQL> CREATE OR REPLACE PROCEDURE DML_10025_PRO_1
+			AS 			
+			BEGIN 
+			SELECT * FROM DML_10025_TEMP WHERE C0 = 1;
+			END; </SQL><!-- 1个结果集 -->
+		<SQL> CREATE OR REPLACE PROCEDURE DML_10025_PRO_2
+			AS 			
+			BEGIN 
+			SELECT * FROM DML_10025_TEMP WHERE C0 = 1;
+			SELECT * FROM DML_10025_TEMP WHERE C0 = 2;
+			END; </SQL><!-- 2个空结果集 -->
+		<SQL> CREATE TABLE DML_10025_TABLE(C0 INT, C1 VARCHAR(100)) </SQL>
+	</SQL_CASE>
+	
+
+	<TestPointBegin>测试点1：开始 </TestPointBegin>
+		<!-- 空结果集过程 -->
+		
+	<SQL_CASE>
+<IGNORE>		<SQL> INSERT INTO DML_10025_TABLE CALL DML_10025_PRO_0</SQL></IGNORE>
+	
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT </TYPE><!-- 预期执行成功，并返回一个结果集，只验证给定值的长度 -->		
+		<SQL> SELECT * FROM DML_10025_TABLE </SQL>
+		<RESULT><!-- (插入的结果集是一个空结果集) -->
+		</RESULT>
+	</SQL_CASE>
+
+	
+
+	<TestPointBegin>测试点2：开始 </TestPointBegin>
+	<!-- 单个结果集过程 -->
+	<SQL_CASE>
+<IGNORE>		<SQL> INSERT INTO DML_10025_TABLE CALL DML_10025_PRO_1</SQL></IGNORE>
+
+<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+	
+		<SQL> SELECT * FROM DML_10025_TABLE </SQL>
+			</SQL_CASE>
+	<SQL_CASE>
+		<SQL> DELETE FROM DML_10025_TABLE </SQL>
+		
+	</SQL_CASE>
+	
+
+	<TestPointBegin>测试点3：开始 </TestPointBegin>
+	<!-- 多个结果集过程 -->
+	<SQL_CASE>
+<IGNORE>		<SQL> INSERT INTO DML_10025_TABLE CALL DML_10025_PRO_2</SQL></IGNORE>
+<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->			
+		<SQL> SELECT * FROM DML_10025_TABLE </SQL>
+
+		<!-- 经过和上海开发人员询问,DM在通过调用存储过程来插入数据时,只能插入最后一个结果集的数据,上面查询语句的结果集只能有2、ABCDEFG -->
+<!--	
+		<RESULT>
+			<RECORD>
+				<COLUMN>1</COLUMN><COLUMN>ABCDEFG</COLUMN>
+				<COLUMN>2</COLUMN><COLUMN>ABCDEFG</COLUMN>
+			</RECORD>
+		</RESULT>
+-->
+	</SQL_CASE>
+	<SQL_CASE>
+		<SQL> DELETE FROM DML_10025_TABLE </SQL>		
+	</SQL_CASE>
+	
+
+	<TestPointBegin>测试点4：开始 </TestPointBegin>
+	<!-- 带结果集的函数-->
+	<SQL_CASE>
+<IGNORE>		<SQL> INSERT INTO DML_10025_TABLE CALL DML_10025_FUN</SQL></IGNORE>
+<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+	
+		<SQL> SELECT * FROM DML_10025_TABLE </SQL>
+		
+	</SQL_CASE>
+	<SQL_CASE>
+		<SQL> DELETE FROM DML_10025_TABLE </SQL>		
+	</SQL_CASE>
+
+	
+
+
+	<CLEAR><!-- 脚本清除模块，该关键字标识清除块开始 -->
+		<SQL_CASE>
+			<SQL> DROP TABLE DML_10025_TEMP </SQL>
+			<SQL> DROP TABLE DML_10025_TABLE </SQL>
+			<SQL> DROP FUNCTION DML_10025_FUN </SQL>
+			<SQL> DROP PROCEDURE DML_10025_PRO_0 </SQL>
+			<SQL> DROP PROCEDURE DML_10025_PRO_1 </SQL>
+			<SQL> DROP PROCEDURE DML_10025_PRO_2 </SQL>
+			
+		</SQL_CASE>
+	</CLEAR>
+</SQLTEST>

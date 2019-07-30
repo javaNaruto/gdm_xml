@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<!--
+	修改记录列表
+	序号		修改类型		修改内容		修改人		修改日期
+	 1		  创建	    创建文件，并完成测试点1-3		黄海明		2005-6-22									
+-->
+<!--
+	测试点列表
+	1.全部删除
+	2.条件删除
+	3.表中有数据被引用时，不能删除
+-->
+<SQLTEST>
+	<CONTENT>视图数据的更新：删除</CONTENT><!-- 请在这里加入对脚本的简要描述 -->
+	<CONNECT>0</CONNECT><!-- 连接数据库 -->
+	<TestPointBegin>测试点1：全部删除 开始 </TestPointBegin>
+	<SQL_CASE>
+		<SQL>CREATE TABLE T01_DDL_00430(C1 INT,C2 CHAR(10));</SQL>
+		<SQL>INSERT INTO T01_DDL_00430 VALUES(1,&apos;OK&apos;);</SQL>
+		<SQL>INSERT INTO T01_DDL_00430 VALUES(2,&apos;HELLO&apos;);</SQL>
+		<SQL>INSERT INTO T01_DDL_00430 VALUES(3,&apos;HI&apos;);</SQL>
+		<SQL>CREATE VIEW V01_DDL_00430 AS SELECT C1 FROM T01_DDL_00430;</SQL>
+		<SQL>DELETE FROM V01_DDL_00430;</SQL>
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT </TYPE><!-- 预期执行成功，并返回一个结果集，只验证给定值的长度 -->
+		<SQL>SELECT * FROM T01_DDL_00430;</SQL>
+		<RESULT><!-- (插入的结果集是一个空结果集) -->
+		</RESULT>
+	</SQL_CASE>
+	<!-- - - - - - - - - - - - 测试点1：结束 - - - - - - - - - - - -->
+	<TestPointBegin>测试点2：条件删除 开始 </TestPointBegin>
+	<SQL_CASE>
+		<SQL>CREATE TABLE T02_DDL_00430(C1 INT,C2 CHAR(10));</SQL>
+		<SQL>INSERT INTO T02_DDL_00430 VALUES(1,&apos;OK&apos;);</SQL>
+		<SQL>INSERT INTO T02_DDL_00430 VALUES(2,&apos;HELLO&apos;);</SQL>
+		<SQL>INSERT INTO T02_DDL_00430 VALUES(3,&apos;HI&apos;);</SQL>
+		<SQL>CREATE VIEW V02_DDL_00430 AS SELECT C1 FROM T02_DDL_00430;</SQL>
+		<SQL>DELETE FROM V02_DDL_00430 WHERE C1=2;</SQL>
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT </TYPE><!-- 预期执行成功，并返回一个结果集，只验证给定值的长度 -->
+		<SQL>SELECT * FROM T02_DDL_00430;</SQL>
+		<RESULT>
+			<RECORD>
+				<COLUMN>1</COLUMN><COLUMN>OK</COLUMN>
+			</RECORD>
+			<RECORD>
+				<COLUMN>3</COLUMN><COLUMN>HI</COLUMN>
+			</RECORD>
+		</RESULT>
+	</SQL_CASE>
+	<!-- - - - - - - - - - - - 测试点2：结束 - - - - - - - - - - - -->
+	<TestPointBegin>测试点3：表中有数据被引用时，不能删除 开始 </TestPointBegin>
+	<SQL_CASE>
+		<SQL>CREATE TABLE T03_DDL_00430(C1 INT NOT NULL,C2 FLOAT NOT NULL,PRIMARY KEY(C1));</SQL>
+		<SQL>INSERT INTO T03_DDL_00430 VALUES(1,12.4)</SQL>
+		<SQL>INSERT INTO T03_DDL_00430 VALUES(2,23.5)</SQL>
+		<SQL>INSERT INTO T03_DDL_00430 VALUES(3,54.7)</SQL>
+		<SQL>CREATE TABLE T04_DDL_00430(C1 INT,C2 FLOAT,FOREIGN KEY(C1) REFERENCES T03_DDL_00430(C1));</SQL>
+		<SQL>INSERT INTO T04_DDL_00430 VALUES(1,45.5)</SQL>
+		<SQL>CREATE VIEW V03_DDL_00430 AS SELECT C1 FROM T03_DDL_00430;</SQL>
+		<SQL>DELETE FROM V03_DDL_00430 WHERE C1=2;</SQL>
+		<!-- 三 -->
+		<TYPE> DIRECT_EXECUTE_FAIL </TYPE><!-- 预期执行失败 -->
+		<SQL>DELETE FROM V03_DDL_00430 WHERE C1=1;</SQL>
+	</SQL_CASE>
+	<!-- - - - - - - - - - - - 测试点3：结束 - - - - - - - - - - - -->
+	<CLEAR><!-- 脚本清除模块，该关键字标识清除块开始 -->
+		<SQL_CASE>
+			<SQL>DROP TABLE T01_DDL_00430 CASCADE;</SQL>
+			<SQL>DROP TABLE T02_DDL_00430 CASCADE;</SQL>
+			<SQL>DROP TABLE T03_DDL_00430 CASCADE;</SQL>   
+			<SQL>DROP TABLE T04_DDL_00430;</SQL>
+		</SQL_CASE>
+	</CLEAR>
+</SQLTEST> 

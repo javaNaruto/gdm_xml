@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<!--
+	修改记录列表
+	序号		修改类型		修改内容		修改人		修改日期
+	1								孙峰		2005/05/09						
+-->
+<!--
+	测试点列表
+	1．	查询语句返回的列数大于插入的列数
+	2．查询语句返回的列数小于插入的列数
+	3．查询语句返回的列类型与插入的列类型不匹配
+	
+-->
+<SQLTEST>
+	<CONTENT> 查询查入，非法的测试用例 </CONTENT><!-- 请在这里加入对脚本的简要描述 -->
+	<CONNECT></CONNECT><!-- 连接数据库 -->
+	<SQL_CASE>
+		<!-- 测试表 -->
+		<SQL> CREATE TABLE DML_10022_TABLE(C0 INT, C1 CHAR(100), C2 DOUBLE, C3 TIMESTAMP)</SQL>
+ 		<SQL> INSERT INTO DML_10022_TABLE VALUES(1, &apos;ABCDEFG&apos;, 1.123456789, {TS&apos;2005-05-09 14:31:31&apos;}) </SQL> 
+ 		<!-- 临时表，列数小于测试表 -->
+ 		<SQL> CREATE TABLE DML_10022_TEMP1(C0 INT, C1 CHAR(100), C2 DOUBLE)</SQL>
+ 		<SQL> INSERT INTO DML_10022_TEMP1 VALUES(1, &apos;ABCDEFG&apos;, 1.123456789) </SQL>
+ 		<!-- 临时表，列数大于测试表 -->
+ 		<SQL> CREATE TABLE DML_10022_TEMP2(C0 INT, C1 CHAR(100), C2 DOUBLE, C3 TIMESTAMP, C4 INT)</SQL>
+ 		<SQL> INSERT INTO DML_10022_TEMP2 VALUES(1, &apos;ABCDEFG&apos;, 1.123456789, {TS&apos;2005-05-09 14:31:31&apos;}, 1) </SQL>
+ 		<!-- 临时表，列数类型跟测试表不匹配 -->
+		<SQL> CREATE TABLE DML_10022_TEMP3(C0 INT, C1 CHAR(100), C2 DOUBLE, C3 DOUBLE)</SQL>
+ 		<SQL> INSERT INTO DML_10022_TEMP3 VALUES(1, &apos;ABCDEFG&apos;, 1.123456789, 1.123456789) </SQL> 
+	</SQL_CASE>
+	<TestPointBegin>测试点1：开始 </TestPointBegin>
+	<!-- 查询语句返回的列数大于插入的列数 -->
+	<SQL_CASE>
+		<SQLSTATE> 21S01 </SQLSTATE><!-- 将插入值列表与列的列表不匹配 -->
+		<TYPE> DIRECT_EXECUTE_FAIL </TYPE><!-- 预期执行失败 -->		
+		<SQL> INSERT INTO DML_10022_TABLE SELECT * FROM DML_10022_TEMP1 </SQL>
+	</SQL_CASE>
+	
+
+	<TestPointBegin>测试点2：开始 </TestPointBegin>
+	<!-- 查询语句返回的列数小于插入的列数 -->
+	<SQL_CASE>
+		<SQLSTATE> 21S01 </SQLSTATE><!-- 将插入值列表与列的列表不匹配 -->
+		<TYPE> DIRECT_EXECUTE_FAIL </TYPE><!-- 预期执行失败 -->	
+		<SQL> INSERT INTO DML_10022_TABLE SELECT * FROM DML_10022_TEMP2 </SQL>
+	</SQL_CASE>
+	
+
+	
+	<TestPointBegin>测试点3：开始 </TestPointBegin>
+	<!-- 查询语句返回的列类型与插入的列类型不匹配 -->
+	<SQL_CASE>
+		<TYPE> DIRECT_EXECUTE_FAIL </TYPE><!-- 预期执行失败 -->		
+		<SQL> INSERT INTO DML_10022_TABLE SELECT * FROM DML_10022_TEMP3 </SQL>
+	</SQL_CASE>
+	
+
+	
+	<CLEAR><!-- 脚本清除模块，该关键字标识清除块开始 -->
+		<SQL_CASE>
+			<SQL> DROP TABLE DML_10022_TABLE </SQL>
+			<SQL> DROP TABLE DML_10022_TEMP1 </SQL>
+			<SQL> DROP TABLE DML_10022_TEMP2 </SQL>
+			<SQL> DROP TABLE DML_10022_TEMP3 </SQL>
+
+		</SQL_CASE>
+	</CLEAR>
+</SQLTEST>

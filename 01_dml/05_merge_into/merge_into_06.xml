@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<!--
+	修改记录列表
+	序号		修改类型		修改内容		修改人		修改日期
+	1		创建			创建文件		肖敏		2011-8-31
+	2		修改			merge不支持子查询      章翊            2011-10-27
+						merge支持delete分支																					
+-->
+<!--
+	测试点列表
+	列存储表的merge into 相关操作
+	测试点1：
+	1.省略UPDATE或INSERT子句
+	2.带条件的Updates和Insert子句
+	3.无条件的Insert
+	4.数据源为子查询
+	5.数据源为视图
+	6.增加DELETE子句
+	
+	测试点2：
+	7.验证UPDATE子句不能更新在ON连接条件中出现的列
+	8.验证若匹配到，源表中匹配行必须唯一
+	9.验证Insert不能包含目标表中的列
+	10.验证insert的where条件只能包含源表列
+	11.验证操作源表和目标表必须具有相应的权限
+	
+	注：暂不支持列存储表		
+-->
+<SQLTEST>
+	<CONTENT>  </CONTENT><!-- 请在这里加入对脚本的简要描述 -->
+	<CONNECT></CONNECT><!-- 连接数据库 -->
+	<TestPointBegin> 测试点1：开始 </TestPointBegin>
+	<SQL_CASE>
+	    <TYPE> DIRECT_EXECUTE_IGNORE </TYPE><!-- 不关心语句执行的结果 -->
+	    <SQL> DROP TABLE T6_MERGE_TABLE_01 CASCADE; </SQL>
+	    <SQL> DROP TABLE T6_MERGE_TABLE_02 CASCADE; </SQL>
+	    <SQL> DROP TABLE T6_MERGE_TABLE_03 CASCADE; </SQL>
+	    <SQL> DROP TABLE T6_MERGE_TABLE_04 CASCADE; </SQL>
+	    <SQL> DROP TABLE T6_MERGE_TABLE_05 CASCADE; </SQL>
+	    <SQL> DROP TABLE T6_MERGE_TABLE_06 CASCADE; </SQL>
+	    <SQL> DROP USER U6_MERGE_INTO CASCADE; </SQL>
+	    
+
+	    
+	    <TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+	    <SQL> CREATE VERTICAL TABLE T6_MERGE_TABLE_01(C1 INT,C2 VARCHAR,C3 VARCHAR); </SQL><!-- 目标表 -->
+	    <SQL> INSERT INTO T6_MERGE_TABLE_01 VALUES(1501, &apos;VIVITAR 35MM&apos;, &apos;ELECTRNCS&apos;); </SQL>
+	    <SQL> INSERT INTO T6_MERGE_TABLE_01 VALUES(1502, &apos;OLYMPUS IS50&apos;, &apos;ELECTRNCS&apos;); </SQL>
+	    <SQL> INSERT INTO T6_MERGE_TABLE_01 VALUES(1600, &apos;PLAY GYM&apos;, &apos;TOYS&apos;); </SQL>
+	    <SQL> INSERT INTO T6_MERGE_TABLE_01 VALUES(1601, &apos;LAMAZE&apos;, &apos;TOYS&apos;); </SQL>
+	    <SQL> INSERT INTO T6_MERGE_TABLE_01 VALUES(1666, &apos;HARRY POTTER&apos;, &apos;DVD&apos;); </SQL>
+	    
+	    <SQL> CREATE VERTICAL TABLE T6_MERGE_TABLE_02(C1 INT,C2 VARCHAR,C3 VARCHAR); </SQL><!-- 源表 -->
+	    <SQL> INSERT INTO T6_MERGE_TABLE_02 VALUES(1502, &apos;OLYMPUS CAMERA&apos;, &apos;ELECTRNCS&apos;); </SQL>
+	    <SQL> INSERT INTO T6_MERGE_TABLE_02 VALUES(1601, &apos;LAMAZE&apos;, &apos;TOYS&apos;); </SQL>
+	    <SQL> INSERT INTO T6_MERGE_TABLE_02 VALUES(1666, &apos;HARRY POTTER&apos;, &apos;TOYS&apos;); </SQL>
+	    <SQL> INSERT INTO T6_MERGE_TABLE_02 VALUES(1700, &apos;WAIT INTERFACE&apos;, &apos;BOOKS&apos;); </SQL>
+	    
+	    <TYPE> DIRECT_EXECUTE_FAIL </TYPE><!-- 预期执行失败 -->
+	    <SQL> MERGE INTO T6_MERGE_TABLE_01 
+	          USING T6_MERGE_TABLE_02
+	          ON(T6_MERGE_TABLE_01.C1=T6_MERGE_TABLE_02.C1)
+	          WHEN MATCHED THEN 
+	          UPDATE SET T6_MERGE_TABLE_01.C2=T6_MERGE_TABLE_02.C2,T6_MERGE_TABLE_01.C3=T6_MERGE_TABLE_02.C3;
+	    </SQL>
+
+	</SQL_CASE>
+	
+	<CLEAR><!-- 脚本清除模块，该关键字标识清除块开始 -->
+		<SQL_CASE>
+			<TYPE> DIRECT_EXECUTE_IGNORE </TYPE><!-- 不关心语句执行的结果 -->
+	                <SQL> DROP TABLE T6_MERGE_TABLE_01 CASCADE; </SQL>
+	                <SQL> DROP TABLE T6_MERGE_TABLE_02 CASCADE; </SQL>
+	                <SQL> DROP TABLE T6_MERGE_TABLE_03 CASCADE; </SQL>
+	                <SQL> DROP TABLE T6_MERGE_TABLE_04 CASCADE; </SQL>
+	                <SQL> DROP TABLE T6_MERGE_TABLE_05 CASCADE; </SQL>
+	                <SQL> DROP TABLE T6_MERGE_TABLE_06 CASCADE; </SQL>
+	                <SQL> DROP USER U6_MERGE_INTO CASCADE; </SQL>
+		</SQL_CASE>
+	</CLEAR>
+</SQLTEST> 

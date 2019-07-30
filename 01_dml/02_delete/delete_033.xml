@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<!--
+	修改记录列表
+	序号		修改类型		修改内容		修改人		修改日期
+	1								孙峰		2005/05/12						
+-->
+<!--
+	测试点列表
+	1.子查询表为其它表
+	2.子查询表为自己 
+	3.一般的条件删除		
+-->
+<SQLTEST>
+	<CONTENT> WHERE条件带查询子句的删除 </CONTENT><!-- 请在这里加入对脚本的简要描述 -->
+	<CONNECT></CONNECT><!-- 连接数据库 -->
+	<SQL_CASE>
+		<SQL> CREATE TABLE DML_20015_TABLE(C0 INT) </SQL>			
+		<SQL> INSERT INTO DML_20015_TABLE VALUES(1) </SQL>
+		<SQL> INSERT INTO DML_20015_TABLE VALUES(2) </SQL>
+		<SQL> INSERT INTO DML_20015_TABLE VALUES(3) </SQL>
+		
+		<SQL> CREATE TABLE DML_20015_TEMP(C0 INT) </SQL>	
+		<SQL> INSERT INTO DML_20015_TEMP VALUES(1) </SQL>
+		<SQL> INSERT INTO DML_20015_TEMP VALUES(2) </SQL>
+
+	</SQL_CASE>
+	<TestPointBegin>测试点1：开始 </TestPointBegin>
+	<!-- 子查询表为其它表 -->
+	<SQL_CASE>
+		<SQL> DELETE FROM DML_20015_TABLE WHERE C0 IN(SELECT C0 FROM DML_20015_TEMP) </SQL>
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT </TYPE><!-- 预期执行成功，并返回一个结果集，只验证给定值的长度 -->
+		<SQL> SELECT * FROM DML_20015_TABLE </SQL>
+		<RESULT>
+			<RECORD>
+				<COLUMN>3</COLUMN>
+			</RECORD>
+		</RESULT>
+	</SQL_CASE>
+	<!-- - - - - - - - - - - - 测试点1：结束 - - - - - - - - - - - -->
+	<TestPointBegin>测试点2：开始 </TestPointBegin>
+	<!-- 子查询表为自己 -->
+	<SQL_CASE>
+		<SQL> INSERT INTO DML_20015_TABLE VALUES(1) </SQL>
+		<SQL> INSERT INTO DML_20015_TABLE VALUES(2) </SQL>
+		<SQL> INSERT INTO DML_20015_TABLE VALUES(3) </SQL>
+	</SQL_CASE>
+	<SQL_CASE>		
+		<SQL> DELETE FROM DML_20015_TABLE WHERE C0 IN(SELECT C0 FROM DML_20015_TABLE) </SQL>
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT </TYPE><!-- 预期执行成功，并返回一个结果集，只验证给定值的长度 -->
+		<SQL> SELECT * FROM DML_20015_TABLE </SQL>
+		<RESULT><!-- (插入的结果集是一个空结果集) -->
+		</RESULT>
+	</SQL_CASE>
+	<!-- - - - - - - - - - - - 测试点2：结束 - - - - - - - - - - - -->
+	<TestPointBegin>测试点3：开始 </TestPointBegin>
+	<!-- 一般的条件删除 -->
+	<SQL_CASE>
+		<SQL> INSERT INTO DML_20015_TABLE VALUES(1) </SQL>
+		<SQL> INSERT INTO DML_20015_TABLE VALUES(2) </SQL>
+		<SQL> INSERT INTO DML_20015_TABLE VALUES(3) </SQL>
+	</SQL_CASE>
+	<SQL_CASE>
+		<SQL> DELETE FROM DML_20015_TABLE WHERE C0&gt;1 AND C0&lt;3 </SQL>
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT </TYPE><!-- 预期执行成功，并返回一个结果集，只验证给定值的长度 -->
+		<SQL> SELECT * FROM DML_20015_TABLE </SQL>
+		<RESULT>
+			<RECORD>
+				<COLUMN>1</COLUMN>
+			</RECORD>
+			<RECORD>
+				<COLUMN>3</COLUMN>
+			</RECORD>
+		</RESULT>
+	</SQL_CASE>
+	<!-- - - - - - - - - - - - 测试点3：结束 - - - - - - - - - - - -->
+	
+	<CLEAR><!-- 脚本清除模块，该关键字标识清除块开始 -->
+		<SQL_CASE>
+			<SQL> DROP TABLE DML_20015_TABLE </SQL>
+			<SQL> DROP TABLE DML_20015_TEMP </SQL>
+		</SQL_CASE>
+	</CLEAR>
+</SQLTEST>

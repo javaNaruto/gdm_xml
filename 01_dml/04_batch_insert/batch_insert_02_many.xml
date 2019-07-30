@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<!--
+	修改记录列表
+	序号		修改类型		修改内容		修改人		修改日期
+	1		创建						范晓燕		2011-7-6																	
+-->
+<!--
+	测试点列表
+	1.		
+-->
+<SQLTEST>
+	<CONTENT>  </CONTENT><!-- 请在这里加入对脚本的简要描述 -->
+	<CONNECT></CONNECT><!-- 连接数据库 -->	
+	<TestPointBegin> 测试点1：开始 </TestPointBegin>
+	<SQL_CASE>	
+	<TYPE> DIRECT_EXECUTE_IGNORE </TYPE><!-- 不关心语句执行的结果 -->
+	<SQL> DROP TABLE T01; </SQL>
+	
+	<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+	<SQL> CREATE TABLE T01(C1 INT); </SQL>
+	
+	<SQL>
+	CREATE OR REPLACE PROCEDURE P1
+	AS
+	I INT;
+	V_STR01 VARCHAR(200);
+	V_STR02 VARCHAR(8000);
+	V_STR03 VARCHAR(200);
+	V_STR04 VARCHAR(8000);
+	BEGIN
+	    V_STR01:='INSERT INTO T01 VALUES';
+	    V_STR02:='';
+		FOR I IN 0..999 
+		  LOOP
+		    V_STR02:= V_STR02 || '(' || 2 || '),';
+		  END LOOP;
+	    V_STR03:='('||1000||');';
+	    V_STR04:= V_STR01 || V_STR02 || V_STR03;
+	    EXECUTE IMMEDIATE V_STR04;
+	END;	 
+	</SQL>	
+	<SQL> CALL P1; </SQL>
+	
+	<SQL> SELECT COUNT(*) FROM T01; </SQL>
+	
+	</SQL_CASE>
+
+	<CLEAR><!-- 脚本清除模块，该关键字标识清除块开始 -->
+		<SQL_CASE>
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE><!-- 不关心语句执行的结果 -->
+		<SQL> DROP TABLE T01; </SQL>	
+		</SQL_CASE>
+	</CLEAR>
+</SQLTEST> 

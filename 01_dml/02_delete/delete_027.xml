@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<!--
+	修改记录列表
+	序号		修改类型		修改内容		修改人		修改日期
+	 1		创建		创建文件，并完成测试点		黄海明		2005-6-16
+	 2		补充		添加测试点6，并完成		冯  源		2005-7-19
+	 3		修改		DM7里去掉了AT关键字		余俊美		2010-10-27
+-->
+<!--
+	测试点列表
+	2.全表删除：带模式名
+	3.全表删除：表中没有数据
+	4.全表删除：表中有数据,验证删除结果
+	5.删除被引用的表中的数据，期望失败
+	6.本语句不会触发delete触发器
+-->
+<SQLTEST>
+	<CONTENT>全表删除语句:TRUNCATE TABLE</CONTENT><!-- 请在这里加入对脚本的简要描述 -->
+	<CONNECT>0</CONNECT><!-- 连接数据库 -->
+
+	<TestPointBegin>测试点2：全表删除：带模式名 开始 </TestPointBegin>
+	<SQL_CASE>
+		<SQL>CREATE TABLE T02_DDL_00280(C1 INT,C2 CHAR(10),C3 DATE);</SQL>
+		<SQL>INSERT INTO T02_DDL_00280 VALUES(123,&apos;OK&apos;,&apos;2005-6-16&apos;);</SQL>
+		<SQL>INSERT INTO T02_DDL_00280 VALUES(124,&apos;KO&apos;,&apos;2005-6-15&apos;);</SQL>
+		<SQL>TRUNCATE TABLE SYSDBA.T02_DDL_00280;</SQL>
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT </TYPE><!-- 预期执行成功，并返回一个结果集，只验证给定值的长度 -->
+		<SQL>SELECT * FROM T02_DDL_00280;</SQL>
+		<RESULT><!-- (插入的结果集是一个空结果集) -->
+		</RESULT>
+	</SQL_CASE>
+	<!-- - - - - - - - - - - - 测试点2：结束 - - - - - - - - - - - -->
+	<TestPointBegin>测试点3：全表删除：表中没有数据 开始 </TestPointBegin>
+	<SQL_CASE>
+		<SQL>CREATE TABLE T03_DDL_00280(C1 INT,C2 CHAR(10),C3 DATE);</SQL>
+		<SQL>TRUNCATE TABLE T03_DDL_00280;</SQL>
+	</SQL_CASE>
+	<!-- - - - - - - - - - - - 测试点3：结束 - - - - - - - - - - - -->
+	<TestPointBegin>测试点4：全表删除：表中有数据,验证删除结果 开始 </TestPointBegin>
+	<SQL_CASE>
+		<SQL>CREATE TABLE T04_DDL_00280(C1 INT,C2 CHAR(10),C3 DATE);</SQL>
+		<SQL>INSERT INTO T04_DDL_00280 VALUES(123,&apos;OK&apos;,&apos;2005-6-16&apos;);</SQL>
+		<SQL>INSERT INTO T04_DDL_00280 VALUES(124,&apos;KO&apos;,&apos;2005-6-15&apos;);</SQL>
+		<SQL>TRUNCATE TABLE T04_DDL_00280;</SQL>
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT </TYPE><!-- 预期执行成功，并返回一个结果集，只验证给定值的长度 -->
+		<SQL>SELECT * FROM T04_DDL_00280;</SQL>
+		<RESULT><!-- (插入的结果集是一个空结果集) -->
+		</RESULT>
+	</SQL_CASE>
+	<!-- - - - - - - - - - - - 测试点4：结束 - - - - - - - - - - - -->
+	<TestPointBegin>测试点5：删除被引用的表中的数据，期望失败  开始 </TestPointBegin>
+	<SQL_CASE>
+		<SQL>CREATE TABLE T05_DDL_00280(C1 INT NOT NULL PRIMARY KEY,C2 CHAR(10),C3 DATE);</SQL>
+		<SQL>CREATE TABLE T06_DDL_00280(C1 INT,FOREIGN KEY(C1) REFERENCES SYSDBA.T05_DDL_00280(C1));</SQL>
+		<SQL>INSERT INTO T05_DDL_00280 VALUES(123,&apos;OK&apos;,&apos;2005-6-16&apos;);</SQL>
+		<SQL>INSERT INTO T05_DDL_00280 VALUES(124,&apos;KO&apos;,&apos;2005-6-15&apos;);</SQL>
+		<SQL>INSERT INTO T06_DDL_00280 VALUES(123);</SQL>
+		<TYPE> DIRECT_EXECUTE_FAIL </TYPE><!-- 预期执行失败 -->
+		<SQL>TRUNCATE TABLE T05_DDL_00280;</SQL>
+	</SQL_CASE>
+	<TestPointBegin>测试点6：本语句不会触发delete触发器  开始 </TestPointBegin>
+	<SQL_CASE>
+		<SQL>CREATE TABLE T07_DDL_00280(C1 INT)</SQL>
+		<SQL>CREATE TABLE T08_DDL_00280(C1 INT)</SQL>
+		<SQL>CREATE OR REPLACE TRIGGER TR01_DDL_00280 BEFORE DELETE ON T07_DDL_00280 FOR EACH ROW BEGIN INSERT INTO T08_DDL_00280 VALUES(1); END;</SQL>
+		<SQL>INSERT INTO T07_DDL_00280 VALUES(2)</SQL>
+		<SQL>INSERT INTO T07_DDL_00280 VALUES(3)</SQL>
+		<SQL>TRUNCATE TABLE T07_DDL_00280;</SQL>
+		<SQL>SELECT * FROM T08_DDL_00280;</SQL>
+		<RESULT><!-- (插入的结果集是一个空结果集) -->
+		</RESULT>
+	</SQL_CASE>
+	<!-- - - - - - - - - - - - 测试点6：结束 - - - - - - - - - - - -->
+	<CLEAR><!-- 脚本清除模块，该关键字标识清除块开始 -->
+		<SQL_CASE>
+			<SQL>DROP TABLE T02_DDL_00280;</SQL>
+			<SQL>DROP TABLE T03_DDL_00280;</SQL>
+			<SQL>DROP TABLE T04_DDL_00280;</SQL>
+			<SQL>DROP TABLE T06_DDL_00280;</SQL>
+			<SQL>DROP TABLE T05_DDL_00280;</SQL>
+			<SQL>DROP TRIGGER TR01_DDL_00280</SQL>
+			<SQL>DROP TABLE T07_DDL_00280;</SQL>
+			<SQL>DROP TABLE T08_DDL_00280;</SQL>
+		</SQL_CASE>
+	</CLEAR>
+</SQLTEST> 

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<!--
+	修改记录列表
+	序号		修改类型		修改内容		修改人		修改日期
+	1		创建			创建文件		余俊美		2010-10-15																
+-->
+<!--
+	测试点列表
+	1.增量不能为0	
+	2.一个表只能有一个标识列
+	3.不能对标识列使用DEFAULT 约束	
+	4.必须同时指定种子和增量值，或者二者都不指定。如果二者都未指定，则取默认值 (1,1)；若种子或增量为小数类型，报错
+-->
+<SQLTEST>
+	<CONTENT>  </CONTENT><!-- 请在这里加入对脚本的简要描述 -->
+	<CONNECT></CONNECT><!-- 连接数据库 -->
+	<TestPointBegin> 测试点1：开始 </TestPointBegin>
+	<SQL_CASE>
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE><!-- 不关心语句执行的结果 -->
+		<SQL> DROP TABLE T1_IDENTITY0001 CASCADE; </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_FAIL </TYPE><!-- 预期执行失败 -->
+		<SQL> CREATE TABLE T1_IDENTITY0001(C1 INT IDENTITY(1,0)); </SQL>
+		
+	</SQL_CASE>
+	
+	<TestPointBegin> 测试点2：开始 </TestPointBegin>
+	<SQL_CASE>
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE><!-- 不关心语句执行的结果 -->
+		<SQL> DROP TABLE T1_IDENTITY0001 CASCADE; </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_FAIL </TYPE><!-- 预期执行失败 -->
+		<SQL> CREATE TABLE T1_IDENTITY0001(C1 INT IDENTITY(1,1),C2 INT IDENTITY(1,1)); </SQL>
+		
+	</SQL_CASE>
+	
+	<TestPointBegin> 测试点3：开始 </TestPointBegin>
+	<SQL_CASE>
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE><!-- 不关心语句执行的结果 -->
+		<SQL> DROP TABLE T1_IDENTITY0001 CASCADE; </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_FAIL </TYPE><!-- 预期执行失败 -->
+		<SQL> CREATE TABLE T1_IDENTITY0001(C1 INT IDENTITY(1,1) DEFAULT 1); </SQL>
+		
+	</SQL_CASE>
+	
+	<TestPointBegin> 测试点4：开始 </TestPointBegin>
+	<SQL_CASE>
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE><!-- 不关心语句执行的结果 -->
+		<SQL> DROP TABLE T1_IDENTITY0001 CASCADE; </SQL>
+		
+		<!-- DM7只支持int和bigint -->
+		<TYPE> DIRECT_EXECUTE_FAIL </TYPE><!-- 预期执行失败 -->
+		<SQL> CREATE TABLE T1_IDENTITY0001(C1 INT IDENTITY(1.1,1)); </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE><!-- 不关心语句执行的结果 -->
+		<SQL> DROP TABLE T1_IDENTITY0001 CASCADE; </SQL>
+		<TYPE> DIRECT_EXECUTE_FAIL </TYPE><!-- 预期执行失败 -->
+		<SQL> CREATE TABLE T1_IDENTITY0001(C1 INT IDENTITY(1,1.1)); </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE><!-- 不关心语句执行的结果 -->
+		<SQL> DROP TABLE T1_IDENTITY0001 CASCADE; </SQL>
+		<TYPE> DIRECT_EXECUTE_FAIL </TYPE><!-- 预期执行失败 -->
+		<SQL> CREATE TABLE T1_IDENTITY0001(C1 INT IDENTITY(1)); </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE><!-- 不关心语句执行的结果 -->
+		<SQL> DROP TABLE T1_IDENTITY0001 CASCADE; </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> CREATE TABLE T1_IDENTITY0001(C1 INT IDENTITY); </SQL>
+		
+	</SQL_CASE>
+	<CLEAR><!-- 脚本清除模块，该关键字标识清除块开始 -->
+		<SQL_CASE>
+			<SQL> DROP TABLE T1_IDENTITY0001 CASCADE; </SQL>
+		</SQL_CASE>
+	</CLEAR>
+</SQLTEST> 

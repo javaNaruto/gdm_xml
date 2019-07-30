@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<!--
+	修改记录列表
+	序号		修改类型		修改内容		修改人		修改日期
+	1		创建			创建文件		余俊美		2010-6-22																
+-->
+<!--
+	测试点列表
+	1.测试=为ASSIGN关键字的情况		
+-->
+<SQLTEST>
+	<CONTENT>  </CONTENT><!-- 请在这里加入对脚本的简要描述 -->
+	<CONNECT></CONNECT><!-- 连接数据库 -->
+	<TestPointBegin> 测试点1：开始 </TestPointBegin>
+	<SQL_CASE>
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE><!-- 不关心语句执行的结果 -->
+		<SQL> drop table t1_update1001 cascade; </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> create table t1_update1001(c1 int); </SQL>
+		<SQL> insert into t1_update1001 values(1); </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> update t1_update1001 set c1 ASSIGN 3; </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL </TYPE><!-- 预期执行成功，并返回一个结果集，验证全字匹配长度 -->
+		<SQL> select * from t1_update1001; </SQL>
+		<RESULT>
+			<RECORD>
+				<COLUMN>3</COLUMN>
+			</RECORD>
+		</RESULT>
+		
+		<TYPE> DIRECT_EXECUTE_FAIL </TYPE><!-- 预期执行失败 -->
+	  <SQL> UPDATE T1_update1001 SET C1 ASSIGN prior('0001-01-01')  ; </SQL>
+	</SQL_CASE>
+	<CLEAR><!-- 脚本清除模块，该关键字标识清除块开始 -->
+		<SQL_CASE>
+			<SQL> drop table t1_update1001 cascade; </SQL>
+		</SQL_CASE>
+	</CLEAR>
+</SQLTEST> 

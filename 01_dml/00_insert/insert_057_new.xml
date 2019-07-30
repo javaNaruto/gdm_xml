@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<!--
+	修改记录列表
+	序号		修改类型		修改内容		修改人		修改日期
+	1								孙峰		2005/05/08	
+	2		date和timestamp		日期和时间格式		方红霞		2013/01/14			
+-->
+<!--
+	测试点列表
+	1.值插入，插入所有数据类型的数据
+	2.时间间隔类型（参看默认值插入）		
+-->
+<SQLTEST>
+	<CONTENT> 插入所有数据类型的数据 </CONTENT><!-- 请在这里加入对脚本的简要描述 -->
+	<TestPointBegin>测试点1：开始 </TestPointBegin>
+	<SQL_CASE>
+		<SQL> CREATE TABLE DML_10015_TABLE(C0 BIGINT, C1 NUMERIC(10, 2), C2 BIT, C3 CHAR(100), C4 CLOB, C5 DATE, C6 DECIMAL(19, 4), C7 DOUBLE, C8 FLOAT, C9 INT, C10 SMALLINT, C11 REAL, C12 NUMERIC, C13 TIME, C14 TIMESTAMP, C15 TINYINT, C16 VARCHAR(100), C17 VARBINARY(100), C18 BLOB, C19 BINARY(100)) </SQL><!-- 用所有数据类型建表 -->
+		<!--
+		<SQL> INSERT INTO DML_10015_TABLE VALUES(100, 100.11, 0, &apos;ABCDEFG&apos;, &apos;ABCDEFG&apos;, {d&apos;2005-05-08&apos;}, &apos;999999999999999.9999&apos;, 9.123456789123456, 9.123456789123456, 123456, 321, 9.1234567, 9, {t&apos;11:11:11&apos;}, {ts&apos;2005-05-08 11:11:11&apos;}, 123, &apos;ABCDEFG&apos;, 0X111111, 0X2222222, 0X333333) </SQL>
+		-->		
+		<SQL> INSERT INTO DML_10015_TABLE VALUES(100, 100.11, 0, &apos;ABCDEFG&apos;, &apos;ABCDEFG&apos;, &apos;2005-05-08&apos;, &apos;999999999999999.9999&apos;, 9.123456789123456, 9.123456789123456, 123456, 321, 9.1234567, 9, &apos;11:11:11&apos;, &apos;2005-05-08 11:11:11&apos;, 123, &apos;ABCDEFG&apos;, 0X111111, 0X2222222, 0X333333) </SQL>
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL </TYPE><!-- 预期执行成功，并返回一个结果集，验证全字匹配长度 -->
+		<SQL> SELECT C0, C1, C2, C3, C4, C5, C6, C7, C8, C9, C10, C11, C12, C13, C14, C15, C16 FROM DML_10015_TABLE </SQL>
+		
+		<RESULT>
+			<RECORD>
+				<COLUMN>100</COLUMN>
+				<COLUMN>100.11</COLUMN>
+				<COLUMN>False</COLUMN>			<!--xml工具问题 <COLUMN>0</COLUMN> -->
+				<COLUMN>ABCDEFG                                                                                             </COLUMN>
+				<COLUMN>ABCDEFG</COLUMN>
+				<COLUMN>2005-5-8 0:00:00</COLUMN>	<!--xml工具问题 <COLUMN>2005-05-08</COLUMN> -->
+				<COLUMN>999999999999999.9999</COLUMN>
+				<COLUMN>9.12345678912346</COLUMN>  <!--xml工具问题 <COLUMN>9.123456789123455</COLUMN> -->
+				<COLUMN>9.12345678912346</COLUMN>  <!--xml工具问题 <COLUMN>9.123456789123455</COLUMN> -->
+				<COLUMN>123456</COLUMN>
+				<COLUMN>321</COLUMN>
+				<COLUMN>9.123457</COLUMN>
+				<COLUMN>9</COLUMN>
+				<COLUMN>2013-1-14 11:11:11</COLUMN>	   <!--xml工具问题，被xml工具转换为当前日期，<COLUMN>11:11:11</COLUMN> -->
+				<COLUMN>2005-5-8 11:11:11</COLUMN>     <!--xml工具问题 	<COLUMN>2005-05-08 11:11:11.0</COLUMN>  -->
+				<COLUMN>123</COLUMN>
+				<COLUMN>ABCDEFG</COLUMN>
+			</RECORD>
+		</RESULT>
+	</SQL_CASE>
+	
+
+	<CLEAR><!-- 脚本清除模块，该关键字标识清除块开始 -->
+		<SQL_CASE>
+			<SQL> DROP TABLE DML_10015_TABLE </SQL>
+			
+		</SQL_CASE>
+	</CLEAR>
+</SQLTEST>

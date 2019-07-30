@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<!--
+	修改记录列表
+	序号		修改类型		修改内容		修改人		修改日期
+	1               创建                    创建测试用例            梁薇            2008-11-11	
+       2               修改                    修改部分测试点          沈成            2011-9-13																
+-->
+<!--
+	测试点列表
+	1.		对于快照库上的自增列表报错
+	2.      对于非自增列的表，也报错
+	3.	根据SMR-ZLM-07092702,创建测例验证@@identity是否报错
+-->
+<SQLTEST>
+	<CONTENT>  </CONTENT><!-- 请在这里加入对脚本的简要描述 -->
+	<CONNECT></CONNECT><!-- 连接数据库 -->
+	<SQL_CASE>	        
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE><!-- 预期执行成功 -->
+		<SQL> drop table t1_ddl_00365 cascade; </SQL>
+		<SQL> drop table t2_ddl_00365 cascade; </SQL>
+		
+	</SQL_CASE>
+
+       
+	<TestPointBegin> 测试点1：开始 </TestPointBegin>
+	<SQL_CASE>	        
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> create table t1_ddl_00365(c1 int, c2 int identity(1,1)); </SQL>
+		<SQL> insert into t1_ddl_00365(c1) values(1); </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> set identity_insert sysdba.t1_ddl_00365 off; </SQL>
+		<SQL> set identity_insert sysdba.t1_ddl_00365 on; </SQL>		
+	</SQL_CASE>
+	
+	<TestPointBegin> 测试点2：开始  </TestPointBegin>
+	<SQL_CASE>
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->	
+		<SQL> create table t2_ddl_00365(c1 int, c2 int); </SQL>
+		<TYPE> DIRECT_EXECUTE_FAIL </TYPE><!-- 预期执行失败 -->		
+		<SQL> set identity_insert sysdba.t2_ddl_00365 off; </SQL>					
+	</SQL_CASE>
+	
+	<TestPointBegin>测试点3：开始 </TestPointBegin>
+	<SQL_CASE>
+	
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL </TYPE><!-- 预期执行成功，并返回一个结果集，验证全字匹配长度 -->
+		<SQL> SELECT @@IDENTITY; </SQL>
+			<RESULT>
+				<RECORD>
+					<COLUMN>1</COLUMN>
+				</RECORD>
+			</RESULT>
+	</SQL_CASE>
+
+	<CLEAR><!-- 脚本清除模块，该关键字标识清除块开始 -->
+		<SQL_CASE>
+				
+		</SQL_CASE>
+	</CLEAR>
+</SQLTEST> 

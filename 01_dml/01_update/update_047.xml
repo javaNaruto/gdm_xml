@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<!--
+	修改记录列表
+	序号		修改类型		修改内容		修改人		修改日期
+	1		创建						田桦		2007-6-21														
+-->
+<!--
+	测试点列表
+	1.更新唯一索引，出现重复值
+	2.根据SMR-WHL-07061401形成测试用例
+-->
+<SQLTEST>
+	<CONTENT> 更新唯一索引 </CONTENT><!-- 请在这里加入对脚本的简要描述 -->
+	<CONNECT></CONNECT><!-- 连接数据库 -->
+	<TestPointBegin>测试点1：开始 </TestPointBegin>
+	<SQL_CASE>
+	<SQL> CREATE TABLE T01_DML_90001(C1 INT PRIMARY KEY, C2 INT); </SQL>
+	<SQL> INSERT INTO T01_DML_90001 VALUES(3, 3); </SQL>
+	<SQL> INSERT INTO T01_DML_90001 VALUES(2, 2); </SQL>
+	<SQL> INSERT INTO T01_DML_90001 VALUES(1, 1); </SQL>
+
+	<TYPE> DIRECT_EXECUTE_FAIL </TYPE><!-- 预期执行失败 -->
+	<SQL> UPDATE T01_DML_90001 SET C1 = 1 WHERE C1 = 3; </SQL>
+		
+	</SQL_CASE>
+	<!-- - - - - - - - - - - - 测试点1：结束 - - - - - - - - - - - -->
+	<CLEAR><!-- 脚本清除模块，该关键字标识清除块开始 -->
+		<SQL_CASE>
+		<SQL> DROP TABLE T01_DML_90001; </SQL>
+			
+		</SQL_CASE>
+	</CLEAR>
+</SQLTEST> 

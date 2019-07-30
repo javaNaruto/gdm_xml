@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<!--
+	修改记录列表
+	序号		修改类型		修改内容		修改人		修改日期
+	1		创建			创建文件		郭振岗		2008-08-01						
+    2		修改			修改文件		刘静		2011-12-14		
+-->
+<!--
+	测试点列表
+	1.覆盖率测试：opt_alter_table_add_identity  覆盖，修改表上一列为自增列 
+	2.测试各种数据类型是否能修改成自增列 
+-->
+<SQLTEST>
+	<CONTENT> 覆盖率测试增加用例 </CONTENT><!-- 请在这里加入对脚本的简要描述 -->
+	<CONNECT>0</CONNECT><!-- 连接数据库 -->
+	<TestPointBegin>测试点1：修改表上一列为自增列</TestPointBegin>	
+	<SQL_CASE>
+		<SQL> create table TO1_DDL_00505(c1 int, c2 varchar(10)); </SQL>
+		<TYPE> DIRECT_EXECUTE_FAIL </TYPE><!-- 预期执行失败 -->
+		<SQL> alter table TO1_DDL_00505 add column c3 identity(-100,10);  </SQL><!-- 试图修改的列不存在 -->		
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> alter table TO1_DDL_00505 add column c1 identity(-100,10); </SQL>
+		<TYPE> DIRECT_EXECUTE_FAIL </TYPE><!-- 预期执行失败 -->
+		<SQL> alter table TO1_DDL_00505 add column c1 identity(-100,10);  </SQL><!-- 表上已有自增列 -->		
+		<SQL> alter table TO1_DDL_00505 add column c2 identity(-100,10);   </SQL>
+		
+	</SQL_CASE>
+	<TestPointBegin>测试点2：测试各种数据类型是否能修改成自增列</TestPointBegin>
+	<SQL_CASE>
+		<SQL> CREATE TABLE TO2_DDL_00505
+			(
+			C1 VARCHAR(100),
+			C2 VARCHAR2(100),
+			C3 BIT,
+			C4 TINYINT,
+			C5 SMALLINT,
+			C6 INT,
+			C7 BIGINT,
+			C8 DEC(13,5),
+			C9 FLOAT,
+			C10 DOUBLE,
+			C11 NUMERIC(13,5),
+			C12 DATE,
+			C13 TIME,
+			C14 DATETIME,
+			C15 BINARY(50),
+			C16 VARBINARY(50),
+			C17 INTERVAL YEAR,
+			C18 INTERVAL YEAR TO MONTH,
+			C19 INTERVAL MONTH,
+			C20 INTERVAL DAY,
+			C21 INTERVAL DAY TO HOUR,
+			C22 INTERVAL DAY TO MINUTE,
+			C23 INTERVAL DAY TO SECOND,
+			C24 INTERVAL HOUR,
+			C25 INTERVAL HOUR TO MINUTE,
+			C26 INTERVAL HOUR TO SECOND,
+			C27 INTERVAL MINUTE,
+			C28 INTERVAL MINUTE TO SECOND,
+			C29 INTERVAL SECOND
+			); </SQL>
+		<TYPE> DIRECT_EXECUTE_FAIL </TYPE><!-- 预期执行失败 -->
+		<SQL> alter table TO2_DDL_00505 add column c1 identity(-100,10); </SQL>
+		<SQL> alter table TO2_DDL_00505 add column c2 identity(-100,10); </SQL>
+		<SQL> alter table TO2_DDL_00505 add column c3 identity(-100,10); </SQL>
+		<SQL> alter table TO2_DDL_00505 add column c8 identity(-100,10); </SQL>
+		<SQL> alter table TO2_DDL_00505 add column c9 identity(-100,10); </SQL>
+		<SQL> alter table TO2_DDL_00505 add column c10 identity(-100,10); </SQL>
+		<SQL> alter table TO2_DDL_00505 add column c11 identity(-100,10); </SQL>
+		<SQL> alter table TO2_DDL_00505 add column c12 identity(-100,10); </SQL>
+		<SQL> alter table TO2_DDL_00505 add column c13 identity(-100,10); </SQL>
+		<SQL> alter table TO2_DDL_00505 add column c14 identity(-100,10); </SQL>
+		<SQL> alter table TO2_DDL_00505 add column c15 identity(-100,10); </SQL>
+		<SQL> alter table TO2_DDL_00505 add column c16 identity(-100,10); </SQL>
+		<SQL> alter table TO2_DDL_00505 add column c17 identity(-100,10); </SQL>
+		<SQL> alter table TO2_DDL_00505 add column c18 identity(-100,10); </SQL>
+		<SQL> alter table TO2_DDL_00505 add column c19 identity(-100,10); </SQL>
+		<SQL> alter table TO2_DDL_00505 add column c20 identity(-100,10); </SQL>
+		<SQL> alter table TO2_DDL_00505 add column c21 identity(-100,10); </SQL>
+		<SQL> alter table TO2_DDL_00505 add column c22 identity(-100,10); </SQL>
+		<SQL> alter table TO2_DDL_00505 add column c23 identity(-100,10); </SQL>
+		<SQL> alter table TO2_DDL_00505 add column c24 identity(-100,10); </SQL>
+		<SQL> alter table TO2_DDL_00505 add column c25 identity(-100,10); </SQL>
+		<SQL> alter table TO2_DDL_00505 add column c26 identity(-100,10); </SQL>
+		<SQL> alter table TO2_DDL_00505 add column c27 identity(-100,10); </SQL>
+		<SQL> alter table TO2_DDL_00505 add column c28 identity(-100,10); </SQL>
+		<SQL> alter table TO2_DDL_00505 add column c29 identity(-100,10); </SQL>
+	    <SQL> alter table TO2_DDL_00505 add column c4 identity(-100,10); </SQL>
+	    <SQL> alter table TO2_DDL_00505 add column c5 identity(-100,10); </SQL>
+
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+	   <SQL> alter table TO2_DDL_00505 add column c6 identity(-100,10); </SQL>
+	   
+	   	<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+	   <SQL> alter table TO2_DDL_00505 drop identity ; </SQL>
+	   <SQL> alter table TO2_DDL_00505 add column c7 identity(-100,10); </SQL>
+	</SQL_CASE>
+	<!-- - - - - - - - - - - - 测试点2：结束 - - - - - - - - - - - -->
+	<CLEAR><!-- 脚本清除模块，该关键字标识清除块开始 -->
+		<SQL_CASE>
+			<SQL> drop table TO1_DDL_00505; </SQL>
+			<SQL> drop table TO2_DDL_00505;  </SQL>			
+		</SQL_CASE>
+	</CLEAR>
+</SQLTEST> 

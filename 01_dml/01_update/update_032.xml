@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<!--
+	修改记录列表
+	序号		修改类型		修改内容		修改人		修改日期
+	1		创建			创建文件		余俊美		2010-7-18																
+-->
+<!--
+	测试点列表
+	1.update select
+-->
+<SQLTEST>
+	<CONTENT>  </CONTENT><!-- 请在这里加入对脚本的简要描述 -->
+	<CONNECT></CONNECT><!-- 连接数据库 -->
+	<TestPointBegin> 测试点1：开始 </TestPointBegin>
+	<SQL_CASE>
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE><!-- 不关心语句执行的结果 -->
+		<SQL> drop table t1_update9002 cascade; </SQL>
+		<SQL> drop view v1_update9002 cascade; </SQL>
+		<SQL> drop table t2_update9002 cascade; </SQL>
+		<SQL> drop view v2_update9002 cascade; </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> create table t1_update9002(c1 int); </SQL>
+		<SQL> create table t2_update9002(c1 int default 9); </SQL>
+		<SQL> create view v1_update9002 as select * from t1_update9002; </SQL>
+		<SQL> create view v2_update9002 as select * from t2_update9002; </SQL>
+		<SQL> insert into t1_update9002 values(1); </SQL>
+		<SQL> insert into t2_update9002 values(1); </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_FAIL </TYPE><!-- 预期执行失败 -->
+		<SQL> update t1_update9002 set c1 = default from t1_update9002; </SQL>
+		<SQL> update t1_update9002 set c1 = default from v1_update9002; </SQL>
+		<SQL> update v1_update9002 set c1 = default from t1_update9002; </SQL>
+		<SQL> update v1_update9002 set c1 = default from v1_update9002; </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> update t2_update9002 set c1 = default from t2_update9002; </SQL>
+		<SQL> update t2_update9002 set c1 = default from v2_update9002; </SQL>
+		<SQL> update v2_update9002 set c1 = default from t2_update9002; </SQL>
+		<SQL> update v2_update9002 set c1 = default from v2_update9002; </SQL>
+	</SQL_CASE>
+	
+	<CLEAR><!-- 脚本清除模块，该关键字标识清除块开始 -->
+		<SQL_CASE>
+			<SQL> drop table t1_update9002 cascade; </SQL>
+			<SQL> drop view v1_update9002 cascade; </SQL>
+			<SQL> drop table t2_update9002 cascade; </SQL>
+			<SQL> drop view v2_update9002 cascade; </SQL>
+		</SQL_CASE>
+	</CLEAR>
+</SQLTEST> 

@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<!--
+	修改记录列表
+	序号		修改类型		修改内容		修改人		修改日期
+	1		创建			创建文件		余俊美		2010-3-29																
+-->
+<!--
+	测试点列表
+	1.[dmServer5.6]无法插入自增列	
+	2.[dmserver5.0]Solaris9平台下的dm5,自增列错误
+	3.[dmserver5.0]Solaris9自增列无法正常插入
+	4.建议规范ident_current函数的报错信息
+-->
+<SQLTEST>
+	<CONTENT>  </CONTENT><!-- 请在这里加入对脚本的简要描述 -->
+	<CONNECT></CONNECT><!-- 连接数据库 -->
+	<TestPointBegin> 测试点1：开始 </TestPointBegin>
+	<SQL_CASE>
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE><!-- 不关心语句执行的结果 -->
+		<SQL> drop table t1_503067 cascade; </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> create table t1_503067(c int,b int identity(1,1)); </SQL>
+		
+		<SQL> insert into t1_503067(c) values(1); </SQL>
+		
+		<SQL> set identity_insert t1_503067 on; </SQL>
+		
+		<SQL> insert into t1_503067(c,b) values(1,5); </SQL>
+		
+	</SQL_CASE>
+
+	<TestPointBegin> 测试点2：开始 </TestPointBegin>
+	<SQL_CASE>
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE><!-- 不关心语句执行的结果 -->
+		<SQL> DROP TABLE T1_503166 CASCADE; </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> CREATE TABLE T1_503166(C0 BIGINT IDENTITY(1,-1), C1 BIGINT); </SQL>
+		<SQL> INSERT INTO T1_503166(C1) VALUES(1); </SQL>
+		<SQL> INSERT INTO T1_503166(C1) VALUES(1); </SQL>
+		<SQL> INSERT INTO T1_503166(C1) VALUES(1); </SQL>
+		<SQL> INSERT INTO T1_503166(C1) VALUES(1); </SQL>
+		<SQL> INSERT INTO T1_503166(C1) VALUES(1); </SQL>
+		<SQL> INSERT INTO T1_503166(C1) VALUES(1); </SQL>
+		<SQL> INSERT INTO T1_503166(C1) VALUES(1); </SQL>
+		<SQL> INSERT INTO T1_503166(C1) VALUES(1); </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL </TYPE><!-- 预期执行成功，并返回一个结果集，验证全字匹配长度 -->
+		<SQL> select C0 from T1_503166; </SQL>
+		<RESULT>
+			<RECORD>
+				<COLUMN>1</COLUMN>
+			</RECORD>
+			<RECORD>
+				<COLUMN>0</COLUMN>
+			</RECORD>
+			<RECORD>
+				<COLUMN>-1</COLUMN>
+			</RECORD>
+			<RECORD>
+				<COLUMN>-2</COLUMN>
+			</RECORD>
+			<RECORD>
+				<COLUMN>-3</COLUMN>
+			</RECORD>
+			<RECORD>
+				<COLUMN>-4</COLUMN>
+			</RECORD>
+			<RECORD>
+				<COLUMN>-5</COLUMN>
+			</RECORD>
+			<RECORD>
+				<COLUMN>-6</COLUMN>
+			</RECORD>
+		</RESULT>
+	</SQL_CASE>
+
+	<TestPointBegin> 测试点3：开始 </TestPointBegin>
+	<SQL_CASE>
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE><!-- 不关心语句执行的结果 -->
+		<SQL> DROP TABLE T1_503167 CASCADE; </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> CREATE TABLE T1_503167(C0 BIGINT IDENTITY(12345,-12345), C1 BIGINT); </SQL>
+		<SQL> INSERT INTO T1_503167(C1) VALUES(12); </SQL>
+		<SQL> INSERT INTO T1_503167(C1) VALUES(12); </SQL>
+	</SQL_CASE>
+
+	<TestPointBegin> 测试点4：开始 </TestPointBegin>
+	<SQL_CASE>
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE><!-- 不关心语句执行的结果 -->
+		<SQL> drop table t1_503594 cascade; </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> create table t1_503594(c1 int); </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_FAIL </TYPE><!-- 预期执行失败 -->
+		<SQL> select ident_current(&apos;t&apos;); </SQL>
+	</SQL_CASE>
+
+	<CLEAR><!-- 脚本清除模块，该关键字标识清除块开始 -->
+		<SQL_CASE>
+			<SQL> drop table t1_503067 cascade; </SQL>
+			<SQL> DROP TABLE T1_503166 CASCADE; </SQL>
+			<SQL> DROP TABLE T1_503167 CASCADE; </SQL>
+			<SQL> drop table t1_503594 cascade; </SQL>
+		</SQL_CASE>
+	</CLEAR>
+</SQLTEST> 

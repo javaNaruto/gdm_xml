@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<!--
+	修改记录列表
+	序号		修改类型		修改内容		修改人		修改日期
+	1               创建                    创建测试用例            梁薇            2008-11-11																	
+-->
+<!--
+	测试点列表
+	1.	delete覆盖率测试
+-->
+<SQLTEST>
+	<CONTENT>  </CONTENT>
+	<UID> SYSDBA </UID>
+	<PWD> SYSDBA </PWD>
+	<DATABASE> SYSTEM </DATABASE>
+	<CONNECT> </CONNECT>
+	<SQL_CASE>
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE>
+		<SQL>DROP VIEW VIEW001;</SQL>
+		<SQL>DROP TABLE TEST;</SQL>
+
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE>
+		<SQL>create table test(c1 int cluster primary key, c2 int);</SQL>
+		<SQL>insert into test values(1,1);</SQL>
+		<SQL>insert into test values(2,1);</SQL>
+		<SQL>insert into test values(3,1);</SQL>
+		<SQL>create view view001 as select * from test;</SQL>
+		<SQL>delete from view001 where c1=2;</SQL>
+	</SQL_CASE>
+	<CLEAR>
+		<SQL_CASE>
+		<SQL>DROP VIEW VIEW001;</SQL>
+		<SQL>DROP TABLE TEST;</SQL>
+		</SQL_CASE>
+	</CLEAR>
+	<DISCONNECT> </DISCONNECT>
+
+</SQLTEST> 

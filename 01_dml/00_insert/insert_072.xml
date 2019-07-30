@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<!--
+	修改记录列表
+	序号		修改类型		修改内容		修改人		修改日期
+	1               创建                    创建测试用例            梁薇            2008-10-20																	
+-->
+<!--
+	测试点列表
+	1.opt_insert_action		
+-->
+<SQLTEST>
+	<CONTENT>  </CONTENT><!-- 请在这里加入对脚本的简要描述 -->
+	<CONNECT></CONNECT><!-- 连接数据库 -->
+	<TestPointBegin> 测试点1：开始 </TestPointBegin>
+	<SQL_CASE>
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> create table t01_dml_10035(c1 int default 4, c2 int); </SQL>
+		<TYPE> DIRECT_EXECUTE_FAIL </TYPE><!-- 预期执行失败 -->
+		<SQL> insert into t01_dml_10035 default values; </SQL>		
+	</SQL_CASE>
+	
+	<SQL_CASE>
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> create table t02_dml_10035(c1 int default 4); </SQL>
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> insert into t02_dml_10035 default values; </SQL>			
+	</SQL_CASE>
+	
+	<SQL_CASE>
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> create table t03_dml_10035(c1 int); </SQL>
+		<TYPE> DIRECT_EXECUTE_FAIL </TYPE><!-- 预期执行失败 -->
+		<SQL> insert into t03_dml_10035 default values; </SQL>			
+	</SQL_CASE>	
+	<CLEAR><!-- 脚本清除模块，该关键字标识清除块开始 -->
+		<SQL_CASE>
+			<SQL> drop table t01_dml_10035; </SQL>
+			<SQL> drop table t02_dml_10035; </SQL>
+			<SQL> drop table t03_dml_10035; </SQL>			
+		</SQL_CASE>
+	</CLEAR>
+</SQLTEST> 

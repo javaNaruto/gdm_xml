@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<!--
+	修改记录列表
+	序号		修改类型		修改内容		修改人		修改日期
+	1		创建			创建文件		余俊美		2010-6-22																
+-->
+<!--
+	测试点列表
+	1.测试目标表为简单子查询
+	2.测试目标表为子查询
+	3.测试子查询 alias
+-->
+<SQLTEST>
+	<CONTENT>  </CONTENT><!-- 请在这里加入对脚本的简要描述 -->
+	<CONNECT></CONNECT><!-- 连接数据库 -->
+	<TestPointBegin> 测试点1：开始 </TestPointBegin>
+	<SQL_CASE>
+		<TYPE> DIRECT_EXECUTE_FAIL </TYPE><!-- 预期执行失败 -->
+		<SQL> DELETE FROM ( SELECT 1 ); </SQL>
+		
+		<SQL> DELETE FROM ( SELECT 'AAA' ); </SQL>
+		
+		<SQL> DELETE FROM ( SELECT INTERVAL '1' YEAR ); </SQL>
+		
+		<SQL> DELETE FROM ( SELECT 1,2,3,4,5,6,7,8,9,0 ); </SQL>
+	</SQL_CASE>
+	
+	<TestPointBegin> 测试点2：开始 </TestPointBegin>
+	<SQL_CASE>
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE><!-- 不关心语句执行的结果 -->
+		<SQL> DROP TABLE T21_DELETE0004 CASCADE; </SQL>
+		<SQL> DROP TABLE T22_DELETE0004 CASCADE; </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> CREATE TABLE T21_DELETE0004(C1 INT); </SQL>
+		<SQL> CREATE TABLE T22_DELETE0004(C1 INT); </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_FAIL </TYPE><!-- 预期执行失败 -->
+		<SQL> DELETE FROM ( SELECT T21_DELETE0004.C1 FROM T21_DELETE0004,T22_DELETE0004 ); </SQL>
+		<SQL> DELETE FROM ( SELECT T21_DELETE0004.C1,T22_DELETE0004.C1 FROM T21_DELETE0004,T22_DELETE0004 ); </SQL>
+	</SQL_CASE>
+	
+	<TestPointBegin> 测试点3：开始 </TestPointBegin>
+	<SQL_CASE>
+		<TYPE> DIRECT_EXECUTE_FAIL </TYPE><!-- 预期执行失败 -->
+		<SQL> DELETE FROM ( SELECT 1 ) _1; </SQL>
+		<SQL> DELETE FROM ( SELECT 1 ) OLD; </SQL>
+		<SQL> DELETE FROM ( SELECT 1 ) AUTHORIZATION; </SQL>
+		<SQL> DELETE FROM ( SELECT 1 ) SELSTAR; </SQL>
+	</SQL_CASE>
+		
+	<CLEAR><!-- 脚本清除模块，该关键字标识清除块开始 -->
+		<SQL_CASE>
+			<SQL> DROP TABLE T21_DELETE0004 CASCADE; </SQL>
+			<SQL> DROP TABLE T22_DELETE0004 CASCADE; </SQL>
+		</SQL_CASE>
+	</CLEAR>
+</SQLTEST> 

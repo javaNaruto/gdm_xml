@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<!--
+	修改记录列表
+	序号		修改类型		修改内容		修改人		修改日期
+	1		创建			创建文件		余俊美		2010-6-10																
+-->
+<!--
+	测试点列表
+	1.foreign key [待完善]
+	4.增加nins_build_is_ins_value_null函数的覆盖率
+-->
+<SQLTEST>
+	<CONTENT>  </CONTENT><!-- 请在这里加入对脚本的简要描述 -->
+	<CONNECT></CONNECT><!-- 连接数据库 -->
+	<TestPointBegin> 测试点1：开始 </TestPointBegin>
+	<SQL_CASE>
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE><!-- 不关心语句执行的结果 -->
+		<SQL> DROP TABLE T1_INSERT0016 CASCADE; </SQL>
+		<SQL> DROP TABLE T2_INSERT0016 CASCADE; </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> CREATE TABLE T1_INSERT0016(C1 INT, C2 INT PRIMARY KEY); </SQL>
+		<SQL> CREATE TABLE T2_INSERT0016(C1 INT, C2 INT REFERENCES T1_INSERT0016(C2)); </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_FAIL </TYPE><!-- 预期执行失败 -->
+		<SQL> INSERT INTO T2_INSERT0016 VALUES(1,1); </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> INSERT INTO T1_INSERT0016 VALUES(1,1); </SQL>
+		<SQL> INSERT INTO T2_INSERT0016 VALUES(1,1); </SQL>
+		<SQL> INSERT INTO T1_INSERT0016 VALUES(3,3); </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> SELECT * FROM T1_INSERT0016; </SQL>
+		<SQL> SELECT * FROM T2_INSERT0016; </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_FAIL </TYPE><!-- 预期执行失败 -->
+		<SQL> UPDATE T1_INSERT0016 SET C2 = 2; </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> UPDATE T1_INSERT0016 SET C1 = 2 WHERE C1 = 1; </SQL>
+		<SQL> UPDATE T1_INSERT0016 SET C2 = 2 WHERE C1 = 3; </SQL>
+		<SQL> UPDATE T2_INSERT0016 SET C2 = 2; </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_FAIL </TYPE><!-- 预期执行失败 -->
+		<SQL> DELETE T1_INSERT0016; </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> DELETE T2_INSERT0016; </SQL>
+		<SQL> DELETE T1_INSERT0016; </SQL>
+	</SQL_CASE>
+	
+	<TestPointBegin> 测试点2：开始 </TestPointBegin>
+	<SQL_CASE>
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE><!-- 不关心语句执行的结果 -->
+		<SQL> DROP TABLE T3_INSERT0016 CASCADE; </SQL>
+		<SQL> DROP TABLE T4_INSERT0016 CASCADE; </SQL>
+		<SQL> DROP INDEX I21_INSERT0016 CASCADE; </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> CREATE TABLE T3_INSERT0016(C1 INT, C2 INT PRIMARY KEY); </SQL>
+		<SQL> CREATE INDEX I21_INSERT0016 ON T3_INSERT0016(C2); </SQL>
+		<SQL> CREATE TABLE T4_INSERT0016(C1 INT, C2 INT REFERENCES T3_INSERT0016(C2)); </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_FAIL </TYPE><!-- 预期执行失败 -->
+		<SQL> INSERT INTO T4_INSERT0016 VALUES(1,1); </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> INSERT INTO T3_INSERT0016 VALUES(1,1); </SQL>
+		<SQL> INSERT INTO T4_INSERT0016(C1) VALUES(1); </SQL>
+		<SQL> INSERT INTO T4_INSERT0016 VALUES(1,1); </SQL>
+		<SQL> INSERT INTO T3_INSERT0016 VALUES(3,3); </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> SELECT * FROM T3_INSERT0016; </SQL>
+		<SQL> SELECT * FROM T4_INSERT0016; </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_FAIL </TYPE><!-- 预期执行失败 -->
+		<SQL> UPDATE T3_INSERT0016 SET C2 = 2; </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> UPDATE T3_INSERT0016 SET C1 = 2 WHERE C1 = 1; </SQL>
+		<SQL> UPDATE T3_INSERT0016 SET C2 = 2 WHERE C1 = 3; </SQL>
+		<SQL> UPDATE T4_INSERT0016 SET C2 = 2; </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_FAIL </TYPE><!-- 预期执行失败 -->
+		<SQL> DELETE T3_INSERT0016; </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> DELETE T4_INSERT0016; </SQL>
+		<SQL> DELETE T3_INSERT0016; </SQL>
+	</SQL_CASE>
+	
+	<TestPointBegin> 测试点3：开始 </TestPointBegin>
+	<SQL_CASE>
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE><!-- 不关心语句执行的结果 -->
+		<SQL> drop table T5_INSERT0016 cascade; </SQL>
+		<SQL> drop table T6_INSERT0016 cascade; </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> create table T5_INSERT0016 (TYPE_ID INTEGER, TYPE_DESC varchar(32), primary key(TYPE_ID)); </SQL>
+		<SQL> create table T6_INSERT0016 (KEY_ID INTEGER, TYPE_ID INTEGER, primary key(KEY_ID), foreign key(TYPE_ID) references T5_INSERT0016); </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> insert into T5_INSERT0016 values(1,1); </SQL>
+		<SQL> insert into T6_INSERT0016 values(2,1); </SQL>
+	</SQL_CASE>
+	
+	<TestPointBegin> 测试点4：开始 </TestPointBegin>
+	<SQL_CASE>
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE><!-- 不关心语句执行的结果 -->
+		<SQL> drop table T7_INSERT0016 cascade; </SQL>
+		<SQL> drop index i71_INSERT0016 cascade; </SQL>
+		<SQL> drop index i72_INSERT0016 cascade; </SQL>
+		<SQL> drop index i73_INSERT0016 cascade; </SQL>
+		<SQL> drop table T8_INSERT0016 cascade; </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> create table t7_insert0016(c1 int,c2 int,primary key(c1,c2)); </SQL>
+		<SQL> create table T8_INSERT0016(c1 int,c2 int,foreign key(c1,c2) references t7_insert0016(c1,c2)); </SQL>
+		<SQL> create index i71_insert0016 on t7_insert0016(c1); </SQL>
+		<SQL> create index i72_insert0016 on t7_insert0016(c1); </SQL>
+		<SQL> create index i73_insert0016 on t7_insert0016(c2); </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> insert into T8_INSERT0016 values(null,null); </SQL>
+	</SQL_CASE>
+		
+	<CLEAR><!-- 脚本清除模块，该关键字标识清除块开始 -->
+		<SQL_CASE>
+			<SQL> DROP TABLE T1_INSERT0016 CASCADE; </SQL>
+			<SQL> DROP TABLE T2_INSERT0016 CASCADE; </SQL>
+			<SQL> DROP TABLE T3_INSERT0016 CASCADE; </SQL>
+			<SQL> DROP TABLE T4_INSERT0016 CASCADE; </SQL>
+			<SQL> DROP INDEX I21_INSERT0016 CASCADE; </SQL>
+			<SQL> drop table T5_INSERT0016 cascade; </SQL>
+			<SQL> drop table T6_INSERT0016 cascade; </SQL>
+			<SQL> drop table T7_INSERT0016 cascade; </SQL>
+			<SQL> drop index i71_INSERT0016 cascade; </SQL>
+			<SQL> drop index i72_INSERT0016 cascade; </SQL>
+			<SQL> drop index i73_INSERT0016 cascade; </SQL>
+			<SQL> drop table T8_INSERT0016 cascade; </SQL>
+		</SQL_CASE>
+	</CLEAR>
+</SQLTEST>

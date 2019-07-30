@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<!--
+	修改记录列表
+	序号		修改类型		修改内容		修改人		修改日期
+	1		编写						孙峰		2005/4/20						
+-->
+<!--
+	测试点列表
+	2.插入语句对像(表)支持指定模式名
+	3.插入语句对像(视图)支持指定库名
+	4.插入语句对像(视图)支持指定模式名
+	
+-->
+<SQLTEST>
+	<CONTENT> 测试插入语句对插入对像名称的完整性支持，包括对像指定模式名，库名 </CONTENT><!-- 请在这里加入对脚本的简要描述 -->
+	<CONNECT> </CONNECT><!-- 连到工具所在的库上建测试表和视图 -->	
+	<SQL_CASE>
+		<SQL> CREATE TABLE DML_10000_TABLE(C0 INT) </SQL><!-- 在工具所在的库上建测试表 -->
+		<SQL> CREATE VIEW DML_10000_VIEW AS SELECT C0 FROM DML_10000_TABLE </SQL><!-- 在上面的表上建一视图 -->
+		<SQL> CREATE SCHEMA DML_10000_SCHEMA </SQL><!-- 创建一个模式来测试插入语句对模式名的指定是否有效 -->
+		<SQL> CREATE TABLE DML_10000_SCHEMA.DML_10000_TABLE(C0 INT) </SQL><!-- 在新建的模式上建测试表 -->
+		<SQL> CREATE VIEW DML_10000_SCHEMA.DML_10000_VIEW AS SELECT C0 FROM DML_10000_SCHEMA.DML_10000_TABLE </SQL><!-- 在新模式上面的表上建一视图 -->
+	</SQL_CASE>
+	<!-- 上面是测试新的准备 -->
+	<TestPointBegin>测试点1：开始 </TestPointBegin>
+	<!-- 为插入的表指定库名 -->
+	<SQL_CASE>
+		<SQL> INSERT INTO SYSDBA.DML_10000_TABLE(C0) VALUES(1) </SQL><!-- 通过在插入语句中指定库名，来对工具所设置的初始库上做插入操作 -->
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT </TYPE><!-- 检察插入语句是否正确执行，应在结果集中得到值1 -->
+		<SQL> SELECT C0 FROM SYSDBA.DML_10000_TABLE</SQL><!-- 查得测试表，得到插入的值 -->
+		<RESULT><!-- 比较结果集 -->
+			<RECORD>
+				<COLUMN>1</COLUMN>
+			</RECORD>
+		</RESULT>
+	</SQL_CASE>	
+	
+	<TestPointBegin>测试点2：开始 </TestPointBegin>
+	<!-- 为插入的表指定模式名 -->
+	<SQL_CASE>		
+		<SQL> INSERT INTO DML_10000_SCHEMA.DML_10000_TABLE(C0) VALUES(1) </SQL><!-- 用只指定模式名的语法对新建模工上的表做插入操作 -->
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT </TYPE><!-- 检察执行结果 -->
+		<SQL> SELECT C0 FROM DML_10000_SCHEMA.DML_10000_TABLE </SQL>
+		<RESULT>
+			<RECORD>
+				<COLUMN>1</COLUMN>
+			</RECORD>
+		</RESULT>	
+	</SQL_CASE>
+	
+
+	<TestPointBegin>测试点3：开始 </TestPointBegin>
+	<!-- 为插入的视图指定库名 -->
+	<SQL_CASE>
+		<SQL> INSERT INTO SYSDBA.DML_10000_VIEW(C0) VALUES(2) </SQL><!-- 通过在插入语句中指定库名，来对工具所设置的初始库上做插入操作 -->
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT </TYPE><!-- 检察插入语句是否正确执行，应在结果集中得到值1 -->
+		<SQL> SELECT C0 FROM SYSDBA.DML_10000_VIEW</SQL><!-- 查得测试表，得到插入的值 -->
+		<RESULT><!-- 比较结果集 -->
+			<RECORD>
+				<COLUMN>1</COLUMN>
+			</RECORD>
+			<RECORD>
+				<COLUMN>2</COLUMN>
+			</RECORD>			
+		</RESULT>
+	</SQL_CASE>
+	
+
+	<TestPointBegin>测试点4：开始 </TestPointBegin>
+	<!-- 为插入的视图指定模式名 -->
+	<SQL_CASE>		
+		<SQL> INSERT INTO DML_10000_SCHEMA.DML_10000_VIEW(C0) VALUES(2) </SQL><!-- 用只指定模式名的语法对新建模工上的表做插入操作 -->
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT </TYPE><!-- 检察执行结果 -->
+		<SQL> SELECT C0 FROM DML_10000_SCHEMA.DML_10000_VIEW</SQL>
+		<RESULT>
+			<RECORD>
+				<COLUMN>1</COLUMN>
+			</RECORD>
+			<RECORD>
+				<COLUMN>2</COLUMN>
+			</RECORD>			
+		</RESULT>	
+	</SQL_CASE>
+
+	<CLEAR><!-- 脚本清除模块，该关键字标识清除块开始 -->
+		<SQL_CASE>
+			<SQL> DROP VIEW DML_10000_VIEW </SQL>			
+			<SQL> DROP TABLE DML_10000_TABLE </SQL>
+			<SQL> DROP VIEW DML_10000_SCHEMA.DML_10000_VIEW </SQL>
+			<SQL> DROP TABLE DML_10000_SCHEMA.DML_10000_TABLE </SQL>
+			<SQL> DROP SCHEMA DML_10000_SCHEMA </SQL>						
+		</SQL_CASE>
+	</CLEAR>
+</SQLTEST>

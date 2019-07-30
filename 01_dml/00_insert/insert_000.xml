@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<!--
+	修改记录列表
+	序号		修改类型		修改内容		修改人		修改日期
+	1		创建			创建文件		余俊美		2010-6-8
+	2		修改			补充测试点8		余俊美		2010-6-22																
+-->
+<!--
+	测试点列表
+	1.表不存在/视图不存在
+	2.列不存在	
+	3.查询插入的源表不存在
+	4.库名.模式名.表名
+	5.模式名.表名
+	6.伪列不能进行插入
+	7.列名不能重复	
+	8.建视图删视图再建视图
+	9.值和列的列表不匹配
+-->
+<SQLTEST>
+    <CONTENT></CONTENT><!-- 请在这里加入对脚本的简要描述 -->
+    <CONNECT></CONNECT><!-- 连接数据库 -->
+    <TestPointBegin>测试点1：开始</TestPointBegin>
+    <SQL_CASE>
+        <TYPE>DIRECT_EXECUTE_IGNORE</TYPE><!-- 不关心语句执行的结果 -->
+        <SQL>g.addV('person');</SQL>
+        <SQL>g.addV('person');</SQL>
+
+        <TYPE>DIRECT_EXECUTE_FAIL</TYPE><!-- 预期执行失败 -->
+        <SQL>g.addV('person');</SQL>
+        <SQL>g.addV('person');</SQL>
+    </SQL_CASE>
+
+    <TestPointBegin>测试点2：开始</TestPointBegin>
+    <SQL_CASE>
+        <TYPE>DIRECT_EXECUTE_IGNORE</TYPE><!-- 不关心语句执行的结果 -->
+        <SQL>g.addV('person');</SQL>
+        <SQL>g.addV('person');</SQL>
+
+        <TYPE>DIRECT_EXECUTE_SUCCESS</TYPE><!-- 预期执行成功 -->
+        <SQL>g.addV('person');</SQL>
+        <SQL>g.addV('person');</SQL>
+
+        <TYPE>DIRECT_EXECUTE_FAIL</TYPE><!-- 预期执行失败 -->
+        <SQL>g.addV('person');</SQL>
+        <SQL>g.addV('person');</SQL>
+    </SQL_CASE>
+
+    <TestPointBegin>测试点3：开始</TestPointBegin>
+    <SQL_CASE>
+        <TYPE>DIRECT_EXECUTE_IGNORE</TYPE><!-- 不关心语句执行的结果 -->
+        <SQL>g.addV('person');</SQL>
+        <SQL>g.addV('person');</SQL>
+
+        <TYPE>DIRECT_EXECUTE_SUCCESS</TYPE><!-- 预期执行成功 -->
+        <SQL>g.addV('person');</SQL>
+
+        <TYPE>DIRECT_EXECUTE_FAIL</TYPE><!-- 预期执行失败 -->
+        <SQL>g.addV('person');</SQL>
+    </SQL_CASE>
+
+    <TestPointBegin>测试点4：开始</TestPointBegin>
+    <SQL_CASE>
+        <TYPE>DIRECT_EXECUTE_IGNORE</TYPE><!-- 不关心语句执行的结果 -->
+        <SQL>g.addV('person');</SQL>
+        <TYPE>DIRECT_EXECUTE_SUCCESS</TYPE><!-- 预期执行成功 -->
+        <SQL>g.addV('person');</SQL>
+        <TYPE>DIRECT_EXECUTE_SUCCESS</TYPE><!-- 预期执行成功 -->
+        <SQL>g.addV('person');</SQL>
+    </SQL_CASE>
+
+    <TestPointBegin>测试点5：开始</TestPointBegin>
+    <SQL_CASE>
+        <TYPE>DIRECT_EXECUTE_IGNORE</TYPE><!-- 不关心语句执行的结果 -->
+        <SQL>g.addV('person');</SQL>
+
+        <TYPE>DIRECT_EXECUTE_SUCCESS</TYPE><!-- 预期执行成功 -->
+        <SQL>g.addV('person');</SQL>
+
+        <TYPE>DIRECT_EXECUTE_SUCCESS</TYPE><!-- 预期执行成功 -->
+        <SQL>g.addV('person');</SQL>
+    </SQL_CASE>
+
+    <TestPointBegin>测试点6：开始</TestPointBegin>
+    <SQL_CASE>
+        <TYPE>DIRECT_EXECUTE_IGNORE</TYPE><!-- 不关心语句执行的结果 -->
+        <SQL>g.addV('person');</SQL>
+
+        <TYPE>DIRECT_EXECUTE_SUCCESS</TYPE><!-- 预期执行成功 -->
+        <SQL>g.addV('person');</SQL>
+
+        <TYPE>DIRECT_EXECUTE_FAIL</TYPE><!-- 预期执行失败 -->
+        <SQL>g.addV('person');</SQL>
+        <SQL>g.addV('person');</SQL>
+        <SQL>g.addV('person');</SQL>
+        <SQL>g.addV('person');</SQL>
+    </SQL_CASE>
+
+    <TestPointBegin>测试点7：开始</TestPointBegin>
+    <SQL_CASE>
+        <TYPE>DIRECT_EXECUTE_IGNORE</TYPE><!-- 不关心语句执行的结果 -->
+        <SQL>g.addV('person');</SQL>
+        <TYPE>DIRECT_EXECUTE_SUCCESS</TYPE><!-- 预期执行成功 -->
+        <SQL>g.addV('person');</SQL>
+        <TYPE>DIRECT_EXECUTE_FAIL</TYPE><!-- 预期执行失败 -->
+        <SQL>g.addV('person');</SQL>
+        <TYPE>DIRECT_EXECUTE_SUCCESS</TYPE><!-- 预期执行成功 -->
+        <SQL>g.addV('person');</SQL>
+    </SQL_CASE>
+
+    <TestPointBegin>测试点8：开始</TestPointBegin>
+    <SQL_CASE>
+        <TYPE>DIRECT_EXECUTE_IGNORE</TYPE><!-- 不关心语句执行的结果 -->
+        <SQL>g.addV('person');</SQL>
+        <SQL>g.addV('person');</SQL>
+        <SQL>g.addV('person');</SQL>
+
+        <TYPE>DIRECT_EXECUTE_SUCCESS</TYPE><!-- 预期执行成功 -->
+        <SQL>g.addV('person');</SQL>
+
+        <TYPE>DIRECT_EXECUTE_SUCCESS</TYPE><!-- 预期执行成功 -->
+        <SQL>g.addV('person');</SQL>
+
+        <TYPE>DIRECT_EXECUTE_SUCCESS</TYPE><!-- 预期执行成功 -->
+        <SQL>g.addV('person');</SQL>
+
+        <TYPE>DIRECT_EXECUTE_SUCCESS</TYPE><!-- 预期执行成功 -->
+        <SQL>g.addV('person');</SQL>
+    </SQL_CASE>
+
+    <SQL_CASE>
+        <TYPE>DIRECT_EXECUTE_IGNORE</TYPE><!-- 不关心语句执行的结果 -->
+        <SQL>g.addV('person');</SQL>
+        <SQL>g.addV('person');</SQL>
+
+        <TYPE>DIRECT_EXECUTE_SUCCESS</TYPE><!-- 预期执行成功 -->
+        <SQL>g.addV('person');</SQL>
+
+        <TYPE>DIRECT_EXECUTE_SUCCESS</TYPE><!-- 预期执行成功 -->
+        <SQL>g.addV('person');</SQL>
+
+        <TYPE>DIRECT_EXECUTE_SUCCESS</TYPE><!-- 预期执行成功 -->
+        <SQL>g.addV('person');</SQL>
+
+        <TYPE>DIRECT_EXECUTE_SUCCESS</TYPE><!-- 预期执行成功 -->
+        <SQL>g.addV('person');</SQL>
+    </SQL_CASE>
+
+    <SQL_CASE>
+        <TYPE>DIRECT_EXECUTE_IGNORE</TYPE><!-- 不关心语句执行的结果 -->
+        <SQL>g.addV('person');</SQL>
+        <SQL>g.addV('person');</SQL>
+
+        <TYPE>DIRECT_EXECUTE_SUCCESS</TYPE><!-- 预期执行成功 -->
+        <SQL>g.addV('person');</SQL>
+
+        <TYPE>DIRECT_EXECUTE_SUCCESS</TYPE><!-- 预期执行成功 -->
+        <SQL>g.addV('person');</SQL>
+
+        <TYPE>DIRECT_EXECUTE_SUCCESS</TYPE><!-- 预期执行成功 -->
+        <SQL>g.addV('person');</SQL>
+
+        <TYPE>DIRECT_EXECUTE_SUCCESS</TYPE><!-- 预期执行成功 -->
+        <SQL>g.addV('person');</SQL>
+    </SQL_CASE>
+
+    <TestPointBegin>测试点9：开始</TestPointBegin>
+    <SQL_CASE>
+        <TYPE>DIRECT_EXECUTE_IGNORE</TYPE><!-- 不关心语句执行的结果 -->
+        <SQL>g.addV('person');</SQL>
+
+        <TYPE>DIRECT_EXECUTE_SUCCESS</TYPE><!-- 预期执行成功 -->
+        <SQL>g.addV('person');</SQL>
+
+        <TYPE>DIRECT_EXECUTE_FAIL</TYPE><!-- 预期执行失败 -->
+        <SQL>g.addV('person');</SQL>
+    </SQL_CASE>
+
+    <SQL_CASE>
+        <TYPE>DIRECT_EXECUTE_IGNORE</TYPE><!-- 不关心语句执行的结果 -->
+        <SQL>g.addV('person');</SQL>
+
+        <TYPE>DIRECT_EXECUTE_SUCCESS</TYPE><!-- 预期执行成功 -->
+        <SQL>g.addV('person');</SQL>
+
+        <TYPE>DIRECT_EXECUTE_FAIL</TYPE><!-- 预期执行失败 -->
+        <SQL>g.addV('person');</SQL>
+    </SQL_CASE>
+
+    <TestPointBegin>测试点2：开始</TestPointBegin>
+    <SQL_CASE>
+        <TYPE>DIRECT_EXECUTE_IGNORE</TYPE><!-- 不关心语句执行的结果 -->
+        <SQL>g.addV('person');</SQL>
+        <SQL>g.addV('person');</SQL>
+
+        <TYPE>DIRECT_EXECUTE_SUCCESS</TYPE><!-- 预期执行成功 -->
+        <SQL>g.addV('person');</SQL>
+        <SQL>g.addV('person');</SQL>
+
+        <TYPE>DIRECT_EXECUTE_FAIL</TYPE><!-- 预期执行失败 -->
+        <SQL>g.addV('person');</SQL>
+        <SQL>g.addV('person');</SQL>
+    </SQL_CASE>
+    <CLEAR><!-- 脚本清除模块，该关键字标识清除块开始 -->
+        <SQL_CASE>
+            <SQL>g.addV('person');</SQL>
+            <SQL>g.addV('person');</SQL>
+            <SQL>g.addV('person');</SQL>
+            <SQL>g.addV('person');</SQL>
+            <SQL>g.addV('person');</SQL>
+            <SQL>g.addV('person');</SQL>
+            <SQL>g.addV('person');</SQL>
+            <SQL>g.addV('person');</SQL>
+            <SQL>g.addV('person');</SQL>
+            <SQL>g.addV('person');</SQL>
+            <SQL>g.addV('person');</SQL>
+            <SQL>g.addV('person');</SQL>
+            <SQL>g.addV('person');</SQL>
+            <SQL>g.addV('person');</SQL>
+            <SQL>g.addV('person');</SQL>
+            <SQL>g.addV('person');</SQL>
+            <SQL>g.addV('person');</SQL>
+            <SQL>g.addV('person');</SQL>
+            <SQL>g.addV('person');</SQL>
+            <SQL>g.addV('person');</SQL>
+        </SQL_CASE>
+    </CLEAR>
+</SQLTEST> 

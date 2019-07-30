@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<!--
+	修改记录列表
+	序号		修改类型		修改内容		修改人		修改日期
+	1		创建			创建文件		余俊美		2010-7-1																
+-->
+<!--
+	测试点列表
+	1.无效的ORDER BY子句
+	2.插入值覆盖率	
+	3.dm_sys_halt	
+	4.cast
+	5.查询插入
+-->
+<SQLTEST>
+	<CONTENT>  </CONTENT><!-- 请在这里加入对脚本的简要描述 -->
+	<CONNECT></CONNECT><!-- 连接数据库 -->
+	<TestPointBegin> 测试点1：开始 </TestPointBegin>
+	<SQL_CASE>
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE><!-- 不关心语句执行的结果 -->
+		<SQL> drop table AUTHORIZATION cascade; </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> create table AUTHORIZATION(var1 int, C1 INT); </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_FAIL </TYPE><!-- 预期执行失败 -->
+		<SQL> INSERT INTO AUTHORIZATION INDEX VAR1 ( C1 , VAR1 ) select 1 MINUS ALL select 1 ORDER SIBLINGS BY 0 , 0 ^ 0 DESC ; </SQL>
+		
+		
+	</SQL_CASE>
+	
+	<TestPointBegin> 测试点2：开始 </TestPointBegin>
+	<SQL_CASE>
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE><!-- 不关心语句执行的结果 -->
+		<SQL> drop table T1_INSERT9000 cascade; </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> create table T1_INSERT9000(C1 INT); </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_FAIL </TYPE><!-- 预期执行失败 -->
+		<SQL>  INSERT INTO T1_INSERT9000(C1) VALUES ((null-'2000-10-10') ); </SQL>
+		<SQL> INSERT T1_INSERT9000(C1) VALUES (prior(null / connect_by_root DAY.UNLIMITED)); </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_FAIL </TYPE><!-- 预期执行失败 -->
+		<SQL> INSERT T1_INSERT9000 VALUES (sizeof(exception) + connect_by_root T5.INTERSECT.INNER); </SQL>
+		<SQL> INSERT INTO T1_INSERT9000 VALUES (-1 ^ connect_by_root CONSTRAINT4.AUTHORIZATION); </SQL>
+		<SQL> INSERT INTO T1_INSERT9000 VALUES ((select 1 union all select 1 intersect all select 1)); </SQL>
+		<SQL> INSERT INTO T1_INSERT9000 VALUES (user * case when  contains ( interval '2.1' second(1) , ? ) then 1 else time '23:59:59' end); </SQL>
+		<SQL> INSERT INTO T1_INSERT9000 VALUES (case when  connect_by_root LEFT &amp; connect_by_root LABEL9.INNER / 1 - 1 = all (prior null ) then interval '15' hour / prior(? % +next value for truncate(1)) | null % user / user  end); </SQL>
+		<SQL> INSERT T1_INSERT9000 VALUES (1 ^ 1 + case sizeof(exception) ^ 1 when 1 then 1  end); </SQL>
+		<SQL> INSERT INTO T1_INSERT9000 VALUES (cast(prior interval '0000-00' year to month as DB10.MINUS.AUTHORIZATION (0))); </SQL>
+		<SQL> INSERT T1_INSERT9000(C1) VALUES (prior(null / connect_by_root DAY.UNLIMITED)); </SQL>
+		<SQL> INSERT INTO T1_INSERT9000 VALUES (connect_by_root LABEL_ITEM3.AUTHORIZATION); </SQL>
+		<SQL> INSERT INTO T1_INSERT9000 VALUES (user * case when  contains ( interval &apos;2.1&apos; second(1) , ? ) then 1 else time &apos;23:59:59&apos; end); </SQL>
+		<SQL> INSERT INTO T1_INSERT9000 VALUES(connect_by_root ROLLFILE);  </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE><!-- 不关心语句执行的结果 -->
+		<SQL> INSERT T1_INSERT9000 VALUES (case interval '00' minute when user() then user()  end); </SQL>
+		<SQL> INSERT INTO T1_INSERT9000 VALUES (cast(1 as bool )); </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_FAIL </TYPE><!-- 预期执行失败 -->
+		<SQL> UPDATE T1_INSERT9000 OUTER SET C1 = 1 WHERE  exists ( select 1 except all select 1 minus all select 1 ); </SQL>
+		<SQL> UPDATE T1_INSERT9000 RESTORE SET C1 ASSIGN ~user() + interval '1234' minute % case when  case user() when trim(prior(null) from ~user * datepart(minute,case when 1==1then 1 when  0 or 0 then -convert(character varying ,user)  end)) ^ user then user else user end like user then user  end % user; </SQL>
+		<SQL> UPDATE T1_INSERT9000 SET C1 = 1 WHERE  interval -'0015' year  in ( (select 1 except  select 1) ); </SQL>
+		<SQL> UPDATE T1_INSERT9000 AS KW_SELSTAR  SET C1 = 1 WHERE  exists ( select 1 minus all select 1 minus distinct select 1 ); </SQL>
+		<SQL> UPDATE T1_INSERT9000 SET C1 ASSIGN connect_by_root CROSS.LABEL  ; </SQL>
+		
+		
+		<TYPE> DIRECT_EXECUTE_FAIL </TYPE><!-- 预期执行失败 -->
+		<SQL> DELETE T1_INSERT9000 WHERE  contains ( typeof(exception) , &apos;中国&apos; AND &apos;49+/*aga&apos; AND NOT &apos;123456&apos; ); </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_FAIL </TYPE><!-- 预期执行失败 -->
+		<SQL> select 1 WHERE  interval '0:0' minute to second &lt; (1 * ~1 - +null); </SQL>
+		<SQL> select 1 WHERE  ( user,-prior(case when 1==1 then 1 when  -sizeof(exception) is not null then (next value for : PASSWORD_POLICY.WHERE + user + ?-(case when 1==1 then 1  end-case interval -'01.01' second when 0 then 0 when interval -'00' year(2) then ~user when user then user else user end) HOUR (999999999) to HOUR (21562632,46454566)) YEAR (123456,123) to YEAR (999999999) * user when 0 then user  end) &amp; user ) overlaps ( user,user ); </SQL>
+		<SQL> select 1 WHERE  ~interval '9999' minute between sizeof(exception) and interval '01.09' second; </SQL>
+			
+	</SQL_CASE>
+	
+	<TestPointBegin> 测试点3：开始 </TestPointBegin>
+	<SQL_CASE>
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE><!-- 不关心语句执行的结果 -->
+		<SQL> drop table t2_insert9000 cascade; </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> CREATE TABLE t2_insert9000(C1 INT,C2 VARCHAR(100),C3 FLOAT,C4 BLOB); </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_FAIL </TYPE><!-- 预期执行失败 -->
+		<SQL> INSERT t2_insert9000 VALUES (0, 0,connect_by_root AUTHORIZATION.PARAM9,-user()); </SQL>
+		
+	</SQL_CASE>
+	
+	<TestPointBegin> 测试点4：开始 </TestPointBegin>
+	<SQL_CASE>
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE><!-- 不关心语句执行的结果 -->
+		<SQL> drop table t4_insert9000 cascade; </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> create table t4_insert9000(c1 double); </SQL>
+		<SQL> insert into t4_insert9000 values(127.88); </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_FAIL </TYPE><!-- 预期执行失败 -->
+		<SQL> select cast(c1 as tinyint) from t4_insert9000; </SQL>
+	</SQL_CASE>
+	
+	<TestPointBegin> 测试点5：开始 </TestPointBegin>
+	<SQL_CASE>
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE><!-- 不关心语句执行的结果 -->
+		<SQL> drop table t5_insert9000 cascade; </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> create table t5_insert9000 (c1 text, c2 real, c3 double); </SQL>
+		<SQL> insert into t5_insert9000 values(null, 1.5, 1.5); </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE><!-- 不关心语句执行的结果 -->
+		<SQL> insert into t5_insert9000(c1) select c2 from t5_insert9000; </SQL>
+	</SQL_CASE>
+	<CLEAR><!-- 脚本清除模块，该关键字标识清除块开始 -->
+		<SQL_CASE>
+			<SQL> drop table AUTHORIZATION cascade; </SQL>
+			<SQL> drop table T1_INSERT9000 cascade; </SQL>
+			<SQL> drop table t2_insert9000 cascade; </SQL>
+			<SQL> drop table t4_insert9000 cascade; </SQL>
+			<SQL> drop table t5_insert9000 cascade; </SQL>
+		</SQL_CASE>
+	</CLEAR>
+</SQLTEST> 

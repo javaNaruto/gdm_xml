@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<!--
+	修改记录列表
+	序号		修改类型		修改内容		修改人		修改日期
+	1								孙峰		2005/05/12
+	2               修改			测试点2中错误返回码     方静            2007-1-10			
+-->
+<!--
+	测试点列表
+	1.在删除引用表数据后再删除被引用表中的数据
+	2.在删除引用表数据前删除被引用表中的数据
+		
+-->
+<SQLTEST>
+	<CONTENT> 引用表的数据删除 </CONTENT><!-- 请在这里加入对脚本的简要描述 -->
+	<CONNECT></CONNECT><!-- 连接数据库 -->
+	<SQL_CASE>
+		<SQL> CREATE TABLE DML_20020_TABLE(C0 INT PRIMARY KEY) </SQL>			
+		<SQL> INSERT INTO DML_20020_TABLE VALUES(1) </SQL>
+		<SQL> INSERT INTO DML_20020_TABLE VALUES(2) </SQL>
+		<SQL> INSERT INTO DML_20020_TABLE VALUES(3) </SQL>
+		
+		<SQL> CREATE TABLE DML_20020_TEMP(C0 INT, FOREIGN KEY(C0) REFERENCES DML_20020_TABLE(C0)) </SQL>	
+		<SQL> INSERT INTO DML_20020_TEMP VALUES(1) </SQL>
+		<SQL> INSERT INTO DML_20020_TEMP VALUES(2) </SQL>
+		<SQL> INSERT INTO DML_20020_TEMP VALUES(3) </SQL>
+
+	</SQL_CASE>
+	<TestPointBegin>测试点1：开始 </TestPointBegin>
+	<!-- 在删除引用表数据后再删除被引用表中的数据 -->
+	<SQL_CASE>
+		<SQL> DELETE FROM DML_20020_TEMP WHERE C0 = 3</SQL>
+		<SQL> DELETE FROM DML_20020_TABLE WHERE C0 = 3</SQL>
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT </TYPE><!-- 预期执行成功，并返回一个结果集，只验证给定值的长度 -->
+		<SQL> SELECT * FROM DML_20020_TABLE </SQL>
+		<RESULT>
+			<RECORD>
+				<COLUMN>1</COLUMN>
+			</RECORD>
+			<RECORD>
+				<COLUMN>2</COLUMN>
+			</RECORD>
+		</RESULT>
+		<SQL> SELECT * FROM DML_20020_TEMP </SQL>
+		<RESULT>
+			<RECORD>
+				<COLUMN>1</COLUMN>
+			</RECORD>
+			<RECORD>
+				<COLUMN>2</COLUMN>
+			</RECORD>
+		</RESULT>
+	</SQL_CASE>
+	<SQL_CASE>
+		<SQL> DELETE FROM DML_20020_TEMP</SQL>
+		<SQL> DELETE FROM DML_20020_TABLE</SQL>
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT </TYPE><!-- 预期执行成功，并返回一个结果集，只验证给定值的长度 -->
+		<SQL> SELECT * FROM DML_20020_TABLE </SQL>
+		<RESULT>
+		</RESULT>
+		<SQL> SELECT * FROM DML_20020_TEMP </SQL>
+		<RESULT>
+		</RESULT>
+	</SQL_CASE>
+	<!-- - - - - - - - - - - - 测试点1：结束 - - - - - - - - - - - -->
+
+	<TestPointBegin>测试点2：开始 </TestPointBegin>
+	<!-- 在删除引用表数据前删除被引用表中的数据 -->
+	<SQL_CASE>
+		<SQL> INSERT INTO DML_20020_TABLE VALUES(1) </SQL>
+		<SQL> INSERT INTO DML_20020_TABLE VALUES(2) </SQL>
+		<SQL> INSERT INTO DML_20020_TABLE VALUES(3) </SQL>
+		<SQL> INSERT INTO DML_20020_TEMP VALUES(1) </SQL>
+		<SQL> INSERT INTO DML_20020_TEMP VALUES(2) </SQL>
+		<SQL> INSERT INTO DML_20020_TEMP VALUES(3) </SQL>
+	</SQL_CASE>
+	<SQL_CASE>
+		<SQLSTATE> 23000 </SQLSTATE><!-- 违反完整性约定 -->
+		<NERROR> -6607 </NERROR><!-- 违反引用约束 -->
+		<TYPE> DIRECT_EXECUTE_FAIL </TYPE><!-- 预期执行失败 -->		
+		<SQL> DELETE FROM DML_20020_TABLE WHERE C0 = 3</SQL>
+		<SQL> DELETE FROM DML_20020_TABLE</SQL>		
+	</SQL_CASE>
+	<!-- - - - - - - - - - - - 测试点2：结束 - - - - - - - - - - - -->
+	
+	<CLEAR><!-- 脚本清除模块，该关键字标识清除块开始 -->
+		<SQL_CASE>			
+			<SQL> DROP TABLE DML_20020_TEMP </SQL>
+			<SQL> DROP TABLE DML_20020_TABLE </SQL>
+		</SQL_CASE>
+	</CLEAR>
+</SQLTEST>

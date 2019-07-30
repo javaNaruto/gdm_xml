@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<!--
+	修改记录列表
+	序号		修改类型		修改内容		修改人		修改日期
+	1               创建                    创建测试用例            梁薇            2008-11-11																	
+-->
+<!--
+	测试点列表
+	1.		
+-->
+<SQLTEST>
+	<CONTENT>  </CONTENT><!-- 请在这里加入对脚本的简要描述 -->
+	<CONNECT></CONNECT><!-- 连接数据库 -->
+	<TestPointBegin> 测试点1：开始 </TestPointBegin>
+	<SQL_CASE>
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> create table t1_dml_10045(c1 int, c2 int); </SQL>
+		<SQL> create table t2_dml_10045(c1 int, c2 int); </SQL>
+		<SQL> insert into t1_dml_10045 values(1,1); </SQL>
+		<SQL> insert into t1_dml_10045 values(2,2); </SQL>
+		<SQL> insert into t2_dml_10045 values(1,1); </SQL>
+		<SQL> insert into t2_dml_10045 values(2,2); </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> insert into t1_dml_10045 select * from t1_dml_10045 where c1 in (select c1 from t2_dml_10045);  </SQL>
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL </TYPE><!-- 预期执行成功，并返回一个结果集，验证全字匹配长度 -->
+		<SQL> select * from t1_dml_10045 order by c1 asc; </SQL>
+		<RESULT>
+			<RECORD>
+				<COLUMN>1</COLUMN><COLUMN>1</COLUMN>
+			</RECORD>
+			<RECORD>
+				<COLUMN>1</COLUMN><COLUMN>1</COLUMN>
+			</RECORD>
+			<RECORD>
+				<COLUMN>2</COLUMN><COLUMN>2</COLUMN>
+			</RECORD>
+			<RECORD>
+				<COLUMN>2</COLUMN><COLUMN>2</COLUMN>
+			</RECORD>
+		</RESULT>		
+	</SQL_CASE>
+	<CLEAR><!-- 脚本清除模块，该关键字标识清除块开始 -->
+		<SQL_CASE>
+			<SQL> drop table t1_dml_10045; </SQL>
+			<SQL> drop table t2_dml_10045; </SQL>			
+		</SQL_CASE>
+	</CLEAR>
+</SQLTEST> 

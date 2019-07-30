@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<!--
+	修改记录列表
+	序号		修改类型		修改内容		修改人		修改日期
+	1		创建			创建文件		余俊美		2009-12-14																
+-->
+<!--
+	测试点列表
+	1.覆盖率测试：函数bin_to_char_ex的覆盖率。		
+-->
+<SQLTEST>
+	<CONTENT>  </CONTENT><!-- 请在这里加入对脚本的简要描述 -->
+	<CONNECT></CONNECT><!-- 连接数据库 -->
+	<TestPointBegin> 测试点1：开始 </TestPointBegin>
+	<SQL_CASE>
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE><!-- 不关心语句执行的结果 -->
+		<SQL> DROP TABLE COV_BIN_TO_CHAR_EX CASCADE; </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> CREATE TABLE COV_BIN_TO_CHAR_EX(C1 BINARY(10),C2 VARBINARY(10)); </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> CREATE OR REPLACE PROCEDURE P1_COV_BIN_TO_CHAR_EX AS
+			BEGIN
+				FOR I IN 1000..2600 LOOP
+				  INSERT INTO COV_BIN_TO_CHAR_EX VALUES(I + 1, I);
+				  END LOOP;
+			END;
+		</SQL>
+		   
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> CALL P1_COV_BIN_TO_CHAR_EX; </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> SELECT SYS_CONNECT_BY_PATH(C1,&apos;/&apos;) FROM  COV_BIN_TO_CHAR_EX WHERE C1 = 2005 CONNECT BY PRIOR C1 = C2 START WITH C1 = 1001; </SQL>
+		
+	</SQL_CASE>
+	<CLEAR><!-- 脚本清除模块，该关键字标识清除块开始 -->
+		<SQL_CASE>
+			<SQL> DROP TABLE COV_BIN_TO_CHAR_EX CASCADE; </SQL>
+			<SQL> DROP PROCEDURE P1_COV_BIN_TO_CHAR_EX CASCADE; </SQL>
+		</SQL_CASE>
+	</CLEAR>
+</SQLTEST> 

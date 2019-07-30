@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<!--
+	修改记录列表
+	序号		修改类型		修改内容		修改人		修改日期
+	1								孙峰		2005/05/12						
+-->
+<!--
+	测试点列表
+	1.表
+	2.视图
+	3.带WITH CHECK OPTION的视图	
+-->
+<SQLTEST>
+	<CONTENT> 测试DELETE把表中的数据全部删除 </CONTENT><!-- 请在这里加入对脚本的简要描述 -->
+	<CONNECT></CONNECT><!-- 连接数据库 -->
+	<SQL_CASE>
+		<SQL> CREATE TABLE DML_20010_TABLE(C0 INT, C1 CHAR(100)) </SQL><!-- 在SYSTEM库上的SYSDBA模式上建测试表 -->
+		<SQL> CREATE VIEW DML_20010_VIEW1 AS SELECT * FROM DML_20010_TABLE WHERE C0=2</SQL><!-- 在SYSTEM库上的SYSDBA模式上建测试视图 -->
+		<SQL> CREATE VIEW DML_20010_VIEW2 AS SELECT * FROM DML_20010_TABLE WHERE C0=1 WITH CHECK OPTION</SQL><!-- 在SYSTEM库上的SYSDBA模式上建测试视图(带CHECK约束) -->
+	</SQL_CASE>
+	<TestPointBegin>测试点1：开始 </TestPointBegin>
+	<!-- 删除表中全部数据 -->
+	<SQL_CASE>
+		<SQL> INSERT INTO DML_20010_TABLE VALUES(1, 'ABCDEFGHIJKMN') </SQL><!-- 插入行测试数据 -->
+		<SQL> INSERT INTO DML_20010_TABLE VALUES(2, 'ABCDEFGHIJKMN') </SQL><!-- 插入行测试数据 -->
+		<SQL> INSERT INTO DML_20010_TABLE SELECT * FROM DML_20010_TABLE </SQL>
+		<SQL> INSERT INTO DML_20010_TABLE SELECT * FROM DML_20010_TABLE </SQL>
+		
+		<SQL> DELETE FROM DML_20010_TABLE </SQL>
+		<!-- 验证结果，SYSTEM库上的测试表应该返回一个结果集 -->
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT </TYPE><!-- 预期执行成功，并返回一个结果集，只验证给定值的长度 -->
+		<SQL> SELECT * FROM DML_20010_TABLE </SQL>
+		<RESULT>
+		</RESULT>
+	</SQL_CASE>
+	<!-- - - - - - - - - - - - 测试点1：结束 - - - - - - - - - - - -->
+
+	<TestPointBegin>测试点2：开始 </TestPointBegin>
+	<!-- 视图 -->
+	<SQL_CASE>
+		<SQL> INSERT INTO DML_20010_TABLE VALUES(1, 'ABCDEFGHIJKMN') </SQL><!-- 插入行测试数据 -->
+		<SQL> INSERT INTO DML_20010_TABLE VALUES(2, 'ABCDEFGHIJKMN') </SQL><!-- 插入行测试数据 -->
+		<SQL> INSERT INTO DML_20010_TABLE SELECT * FROM DML_20010_TABLE </SQL>
+		<SQL> INSERT INTO DML_20010_TABLE SELECT * FROM DML_20010_TABLE </SQL>
+		
+		<SQL> DELETE FROM DML_20010_VIEW1 </SQL>
+		<!-- 验证结果，SYSTEM库上的测试表应该返回一个结果集 -->
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT </TYPE><!-- 预期执行成功，并返回一个结果集，只验证给定值的长度 -->
+		<SQL> SELECT * FROM DML_20010_TABLE </SQL>
+		<RESULT>
+			<RECORD>
+				<COLUMN>1</COLUMN><COLUMN>ABCDEFGHIJKMN</COLUMN>
+			</RECORD>
+			<RECORD>
+				<COLUMN>1</COLUMN><COLUMN>ABCDEFGHIJKMN</COLUMN>
+			</RECORD>
+			<RECORD>
+				<COLUMN>1</COLUMN><COLUMN>ABCDEFGHIJKMN</COLUMN>
+			</RECORD>
+			<RECORD>
+				<COLUMN>1</COLUMN><COLUMN>ABCDEFGHIJKMN</COLUMN>
+			</RECORD>
+		</RESULT>
+
+	</SQL_CASE>
+	<!-- - - - - - - - - - - - 测试点2：结束 - - - - - - - - - - - -->
+
+	<TestPointBegin>测试点3：开始 </TestPointBegin>
+	<!-- 带WITH CHECK OPTION的视图 -->
+	<SQL_CASE>
+		<SQL> INSERT INTO DML_20010_TABLE VALUES(1, 'ABCDEFGHIJKMN') </SQL><!-- 插入行测试数据 -->
+		<SQL> INSERT INTO DML_20010_TABLE VALUES(2, 'ABCDEFGHIJKMN') </SQL><!-- 插入行测试数据 -->
+		<SQL> INSERT INTO DML_20010_TABLE SELECT * FROM DML_20010_TABLE </SQL>
+		<SQL> INSERT INTO DML_20010_TABLE SELECT * FROM DML_20010_TABLE </SQL>
+		
+		<SQL> DELETE FROM DML_20010_VIEW2 </SQL>
+		<!-- 验证结果，SYSTEM库上的测试表应该返回一个结果集 -->
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT </TYPE><!-- 预期执行成功，并返回一个结果集，只验证给定值的长度 -->
+		<SQL> SELECT * FROM DML_20010_TABLE </SQL>
+		<RESULT>
+			<RECORD>
+				<COLUMN>2</COLUMN><COLUMN>ABCDEFGHIJKMN</COLUMN>
+			</RECORD>
+			<RECORD>
+				<COLUMN>2</COLUMN><COLUMN>ABCDEFGHIJKMN</COLUMN>
+			</RECORD>
+			<RECORD>
+				<COLUMN>2</COLUMN><COLUMN>ABCDEFGHIJKMN</COLUMN>
+			</RECORD>
+			<RECORD>
+				<COLUMN>2</COLUMN><COLUMN>ABCDEFGHIJKMN</COLUMN>
+			</RECORD>
+		</RESULT>
+	</SQL_CASE>
+	<!-- - - - - - - - - - - - 测试点3：结束 - - - - - - - - - - - -->
+	
+	<CLEAR><!-- 脚本清除模块，该关键字标识清除块开始 -->
+		<SQL_CASE>
+			<SQL> DROP VIEW DML_20010_VIEW1 </SQL>
+			<SQL> DROP VIEW DML_20010_VIEW2 </SQL>	
+			<SQL> DROP TABLE DML_20010_TABLE </SQL>			
+		</SQL_CASE>
+	</CLEAR>
+</SQLTEST>

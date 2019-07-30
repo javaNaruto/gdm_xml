@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<!--
+	修改记录列表
+	序号		修改类型		修改内容		修改人		修改日期
+	1		创建						范晓燕		2011-7-6																	
+-->
+<!--
+	测试点列表
+	1.		
+-->
+<SQLTEST>
+	<CONTENT>  </CONTENT><!-- 请在这里加入对脚本的简要描述 -->
+	<CONNECT></CONNECT><!-- 连接数据库 -->	
+	<TestPointBegin> 测试点1：开始 </TestPointBegin>
+	<SQL_CASE>	
+	<TYPE> DIRECT_EXECUTE_IGNORE </TYPE><!-- 不关心语句执行的结果 -->
+	<SQL> DROP TABLE T_RANGE; </SQL>
+	<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+	<SQL> CREATE TABLE T_RANGE(C1 INT)PARTITION BY RANGE(C1)
+		(
+		partition hp1 values less than(100),
+		partition hp2 values less than(200),
+		partition hp3 values less than(300)
+		); 
+	</SQL>
+	
+	<SQL> INSERT INTO T_RANGE VALUES(99),(199),(299); </SQL>	
+	
+	<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL </TYPE><!-- 预期执行成功，并返回一个结果集，验证全字匹配长度 -->
+	<SQL> SELECT * FROM T_RANGE; </SQL>
+	<RESULT>
+		<RECORD>
+			<COLUMN>99</COLUMN>
+		</RECORD>
+		<RECORD>
+			<COLUMN>199</COLUMN>
+		</RECORD>
+		<RECORD>
+			<COLUMN>299</COLUMN>
+		</RECORD>
+	</RESULT>
+		
+	</SQL_CASE>
+	
+	<CLEAR><!-- 脚本清除模块，该关键字标识清除块开始 -->
+		<SQL_CASE>
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE><!-- 不关心语句执行的结果 -->
+		<SQL> DROP TABLE T_RANGE; </SQL>	
+		</SQL_CASE>
+	</CLEAR>
+</SQLTEST> 

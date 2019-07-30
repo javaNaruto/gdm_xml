@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<!--
+-->
+<!--覆盖率-->
+<SQLTEST>
+	<CONTENT> 还需要增加在表上已被加锁的情况 </CONTENT>
+	<UID> SYSDBA </UID>
+	<PWD> SYSDBA </PWD>
+	<DATABASE> SYSTEM </DATABASE>
+	<CONNECT> </CONNECT>
+	<SQL_CASE>
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE>
+		<SQL>drop table t2 cascade;</SQL>
+		<SQL>drop table t1 cascade;</SQL>
+
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE>
+		<SQL>create table t1(c0 int,c1 int,c2 int,unique(c0,c1));</SQL>
+		<SQL>insert into t1 values(1,1,1);</SQL>
+		<SQL>insert into t1 values(2,2,2);</SQL>
+		<SQL>insert into t1 values(3,3,3);</SQL>
+		<SQL>create table t2(c0 int,c1 int,c2 int,foreign key(c0,c1) references t1(c0,c1) );</SQL>
+		<SQL>insert into t2 values(1,1,1);</SQL>
+		<SQL>update t1 set c0=22,c1=22,c2=22 where c1=2;</SQL>
+
+		<TYPE> DIRECT_EXECUTE_FAIL </TYPE>
+		<SQL>update t1 set c0=0,c1=0,c2=0 where c1=1;</SQL>
+		<SQL>update t2 set c0=0,c1=0,c2=0 where c1=1;</SQL>
+
+		<TYPE>DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL</TYPE>
+		<SQL> SELECT COUNT(*) FROM T1 WHERE C0=22; </SQL>
+		<RESULT>
+			<RECORD><COLUMN>1</COLUMN></RECORD>
+		</RESULT>
+		<SQL> SELECT COUNT(*) FROM T1 WHERE C2=22; </SQL>
+		<RESULT>
+			<RECORD><COLUMN>1</COLUMN></RECORD>
+		</RESULT>
+
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE>
+		<SQL>drop table t2 cascade;</SQL>
+		<SQL>drop table t1 cascade;</SQL>
+
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE>
+		<SQL>create table t1(c0 int primary key,c1 int,c2 int);</SQL>
+		<SQL>insert into t1 values(1,1,1);</SQL>
+		<SQL>insert into t1 values(2,2,2);</SQL>
+		<SQL>insert into t1 values(3,3,3);</SQL>
+		<SQL>create table t2(c0 int,c1 int,c2 int,foreign key(c0) references t1(c0) );</SQL>
+		<SQL>insert into t2 values(1,1,1);</SQL>
+		<SQL>update t1 set c0=22,c1=22,c2=22 where c1=2;</SQL>
+
+		<TYPE> DIRECT_EXECUTE_FAIL </TYPE>
+		<SQL>update t1 set c0=0,c1=0,c2=0 where c1=1;</SQL>
+		<SQL>update t2 set c0=0,c1=0,c2=0 where c1=1;</SQL>
+
+		<TYPE>DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL</TYPE>
+		<SQL> SELECT COUNT(*) FROM T1 WHERE C0=22; </SQL>
+		<RESULT>
+			<RECORD><COLUMN>1</COLUMN></RECORD>
+		</RESULT>
+		<SQL> SELECT COUNT(*) FROM T1 WHERE C2=22; </SQL>
+		<RESULT>
+			<RECORD><COLUMN>1</COLUMN></RECORD>
+		</RESULT>
+
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE>
+		<SQL>drop table t2 cascade;</SQL>
+		<SQL>drop table t1 cascade;</SQL>
+
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE>
+		<SQL>create table t1(c0 int,c1 int,c2 int,unique(c0,c1));</SQL>
+		<SQL>insert into t1 values(1,1,1);</SQL>
+		<SQL>insert into t1 values(2,2,2);</SQL>
+		<SQL>insert into t1 values(3,3,3);</SQL>
+		<SQL>create table t2(c0 int,c1 int,c2 int,foreign key(c0,c1) references t1(c0,c1) with index);</SQL>
+		<SQL>insert into t2 values(1,1,1);</SQL>
+		<SQL>update t1 set c0=22,c1=22,c2=22 where c1=2;</SQL>
+
+		<TYPE> DIRECT_EXECUTE_FAIL </TYPE>
+		<SQL>update t1 set c0=0,c1=0,c2=0 where c1=1;</SQL>
+		<SQL>update t2 set c0=0,c1=0,c2=0 where c1=1;</SQL>
+
+		<TYPE>DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL</TYPE>
+		<SQL> SELECT COUNT(*) FROM T1 WHERE C0=22; </SQL>
+		<RESULT>
+			<RECORD><COLUMN>1</COLUMN></RECORD>
+		</RESULT>
+		<SQL> SELECT COUNT(*) FROM T1 WHERE C2=22; </SQL>
+		<RESULT>
+			<RECORD><COLUMN>1</COLUMN></RECORD>
+		</RESULT>
+
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE>
+		<SQL>drop table t2 cascade;</SQL>
+		<SQL>drop table t1 cascade;</SQL>
+
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE>
+		<SQL>create table t1(c0 int primary key,c1 int,c2 int);</SQL>
+		<SQL>insert into t1 values(1,1,1);</SQL>
+		<SQL>insert into t1 values(2,2,2);</SQL>
+		<SQL>insert into t1 values(3,3,3);</SQL>
+		<SQL>create table t2(c0 int,c1 int,c2 int,foreign key(c0) references t1(c0) with index);</SQL>
+		<SQL>insert into t2 values(1,1,1);</SQL>
+		<SQL>update t1 set c0=22,c1=22,c2=22 where c1=2;</SQL>
+
+		<TYPE> DIRECT_EXECUTE_FAIL </TYPE>
+		<SQL>update t1 set c0=0,c1=0,c2=0 where c1=1;</SQL>
+		<SQL>update t2 set c0=0,c1=0,c2=0 where c1=1;</SQL>
+
+		<TYPE>DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL</TYPE>
+		<SQL> SELECT COUNT(*) FROM T1 WHERE C0=22; </SQL>
+		<RESULT>
+			<RECORD><COLUMN>1</COLUMN></RECORD>
+		</RESULT>
+		<SQL> SELECT COUNT(*) FROM T1 WHERE C2=22; </SQL>
+		<RESULT>
+			<RECORD><COLUMN>1</COLUMN></RECORD>
+		</RESULT>
+
+
+		<!-- disallowrowlock -->
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE>
+		<SQL>drop table t2 cascade;</SQL>
+		<SQL>drop table t1 cascade;</SQL>
+
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE>
+		<SQL>create table t1(c0 int,c1 int,c2 int,unique(c0,c1));</SQL>
+		<SQL>insert into t1 values(1,1,1);</SQL>
+		<SQL>insert into t1 values(2,2,2);</SQL>
+		<SQL>insert into t1 values(3,3,3);</SQL>
+		<SQL>create table t2(c0 int,c1 int,c2 int,foreign key(c0,c1) references t1(c0,c1) with index);</SQL>
+		<SQL>insert into t2 values(1,1,1);</SQL>
+		<SQL>update t1 set c0=22,c1=22,c2=22 where c1=2;</SQL>
+
+		<BEGINTRANS></BEGINTRANS>
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE><!-- 不关心语句执行的结果 -->
+		<SQL>SELECT SET_TABLE_OPTION('T1','DISALLOWROWLOCKS',1);</SQL>
+		<SQL>SELECT SET_TABLE_OPTION('T2','DISALLOWROWLOCKS',1);</SQL>
+
+		<TYPE> DIRECT_EXECUTE_FAIL </TYPE>
+		<SQL>update t1 set c0=0,c1=0,c2=0 where c1=1;</SQL>
+		<SQL>update t2 set c0=0,c1=0,c2=0 where c1=1;</SQL>
+
+		<TYPE>DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL</TYPE>
+		<SQL> SELECT COUNT(*) FROM T1 WHERE C0=22; </SQL>
+		<RESULT>
+			<RECORD><COLUMN>1</COLUMN></RECORD>
+		</RESULT>
+		<SQL> SELECT COUNT(*) FROM T1 WHERE C2=22; </SQL>
+		<RESULT>
+			<RECORD><COLUMN>1</COLUMN></RECORD>
+		</RESULT>
+		<ENDTRANS></ENDTRANS>
+
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE>
+		<SQL>drop table t2 cascade;</SQL>
+		<SQL>drop table t1 cascade;</SQL>
+
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE>
+		<SQL>create table t1(c0 int primary key,c1 int,c2 int);</SQL>
+		<SQL>insert into t1 values(1,1,1);</SQL>
+		<SQL>insert into t1 values(2,2,2);</SQL>
+		<SQL>insert into t1 values(3,3,3);</SQL>
+		<SQL>create table t2(c0 int,c1 int,c2 int,foreign key(c0) references t1(c0) with index);</SQL>
+		<SQL>insert into t2 values(1,1,1);</SQL>
+		<SQL>update t1 set c0=22,c1=22,c2=22 where c1=2;</SQL>
+
+		<BEGINTRANS></BEGINTRANS>
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE><!-- 不关心语句执行的结果 -->
+		<SQL>SELECT SET_TABLE_OPTION('T1','DISALLOWROWLOCKS',1);</SQL>
+		<SQL>SELECT SET_TABLE_OPTION('T2','DISALLOWROWLOCKS',1);</SQL>
+		<TYPE> DIRECT_EXECUTE_FAIL </TYPE>
+		<SQL>update t1 set c0=0,c1=0,c2=0 where c1=1;</SQL>
+		<SQL>update t2 set c0=0,c1=0,c2=0 where c1=1;</SQL>
+
+		<TYPE>DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL</TYPE>
+		<SQL> SELECT COUNT(*) FROM T1 WHERE C0=22; </SQL>
+		<RESULT>
+			<RECORD><COLUMN>1</COLUMN></RECORD>
+		</RESULT>
+		<SQL> SELECT COUNT(*) FROM T1 WHERE C2=22; </SQL>
+		<RESULT>
+			<RECORD><COLUMN>1</COLUMN></RECORD>
+		</RESULT>
+
+		<ENDTRANS></ENDTRANS>
+
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE>
+		<SQL>drop table t2 cascade;</SQL>
+		<SQL>drop table t1 cascade;</SQL>
+
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE>
+		<SQL> CREATE TABLE T1(C1 INT CLUSTER PRIMARY KEY,C2 INT); </SQL>
+		<SQL> INSERT INTO T1 VALUES(1,1); </SQL>
+		<SQL> UPDATE T1 SET C1=2; </SQL>
+		<SQL> UPDATE T1 SET C1=2,C2=2; </SQL>
+
+		<BEGINTRANS></BEGINTRANS>
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE><!-- 不关心语句执行的结果 -->
+		<SQL>SELECT SET_TABLE_OPTION('T1','DISALLOWROWLOCKS',1);</SQL>
+		
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE>
+		<SQL> UPDATE T1 SET C1=3,C2=3; </SQL>
+		<SQL> DELETE FROM T1; </SQL>
+		<SQL>
+			CREATE OR REPLACE PROCEDURE P1 AS
+				I INT; 
+			BEGIN
+				FOR I IN 1..10000 LOOP
+					INSERT INTO T1 VALUES(I,I); 
+				END LOOP; 
+			END;
+		</SQL>
+		<SQL> CALL P1; </SQL>
+
+		<TYPE> DIRECT_EXECUTE_FAIL </TYPE>
+		<SQL> UPDATE T1 SET C1=C1%100,C2=C2+100; </SQL>
+
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE>
+		<SQL> UPDATE T1 SET C1=C1+1000,C2=C2+1000; </SQL>
+		<SQL> COMMIT; </SQL>
+		<ENDTRANS></ENDTRANS>
+
+		<TYPE>DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL</TYPE>
+		<SQL> SELECT COUNT(*) FROM T1; </SQL>
+		<RESULT>
+			<RECORD><COLUMN>10000</COLUMN></RECORD>
+		</RESULT>
+
+		<BEGINTRANS></BEGINTRANS>
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE>
+		<SQL>SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;</SQL>
+		<!--<SQL>SELECT SET_TABLE_OPTION('T1','DISALLOWROWLOCKS',1);</SQL> 不关心语句执行的结果 -->
+
+		<TYPE> DIRECT_EXECUTE_FAIL </TYPE>
+		<SQL> UPDATE T1 SET C1=C1%100,C2=C2+100; </SQL>
+
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE>
+		<SQL> UPDATE T1 SET C1=C1-1000,C2=C2-1000; </SQL>
+		<ENDTRANS></ENDTRANS>
+
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE>
+		<SQL> DROP PROCEDURE P1; </SQL>
+		<SQL>drop table t2 cascade;</SQL>
+		<SQL>drop table t1 cascade;</SQL>
+
+	</SQL_CASE>
+	<CLEAR>
+		<SQL_CASE>
+		</SQL_CASE>
+	</CLEAR>
+	<DISCONNECT> </DISCONNECT>
+
+</SQLTEST> 

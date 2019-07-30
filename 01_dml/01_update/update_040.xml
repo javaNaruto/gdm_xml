@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<!--
+	修改记录列表
+	序号		修改类型		修改内容		修改人		修改日期
+	1								孙峰		2005/05/16						
+-->
+<!--
+	测试点列表
+		1.最常用的运算 
+	2.自定义函数
+	3.集函数	
+-->
+<SQLTEST>
+	<CONTENT> 被更新列值的表达式表示</CONTENT><!-- 请在这里加入对脚本的简要描述 -->
+	<CONNECT></CONNECT><!-- 连接数据库 -->
+	<SQL_CASE>
+		<SQL> CREATE TABLE DML_30015_TABLE(C0 INT, C1 VARCHAR(100)) </SQL>
+		<SQL> INSERT INTO DML_30015_TABLE VALUES(1, &apos;ABCDEFG &apos;) </SQL>
+		<SQL> INSERT INTO DML_30015_TABLE VALUES(3, &apos;ABCDEFG &apos;) </SQL>
+
+		<SQL> CREATE OR REPLACE FUNCTION DML_30015_FUN1 RETURN INT 
+			AS 
+			S1 INT; 
+			BEGIN 
+			S1:=2147483647;
+			RETURN S1; 
+			END; </SQL>
+		<SQL> CREATE OR REPLACE FUNCTION DML_30015_FUN2 RETURN VARCHAR(100) 
+			AS 
+			S1 VARCHAR(100); 
+			BEGIN 
+			S1:='ABCDEFG'; 
+			RETURN S1; 
+			END; </SQL>
+	</SQL_CASE>
+	<TestPointBegin>测试点1：开始 </TestPointBegin>
+	<!-- 最常用的运算 -->
+	<SQL_CASE>
+		<SQL> UPDATE DML_30015_TABLE SET C0=C0+1, C1=&apos;ABC&apos; WHERE C0=1 </SQL>	
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT </TYPE><!-- 预期执行成功，并返回一个结果集，只验证给定值的长度 -->
+		<SQL> SELECT * FROM DML_30015_TABLE </SQL>
+		<RESULT>
+			<RECORD>
+				<COLUMN>2</COLUMN><COLUMN>ABC</COLUMN>
+			</RECORD>
+			<RECORD>
+				<COLUMN>3</COLUMN><COLUMN>ABCDEFG</COLUMN>
+			</RECORD>
+		</RESULT>	
+	</SQL_CASE>
+	<SQL_CASE>
+		<SQL> UPDATE DML_30015_TABLE SET C0=C0-1, C1=&apos;ABC&apos; WHERE C0=2 </SQL>	
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT </TYPE><!-- 预期执行成功，并返回一个结果集，只验证给定值的长度 -->
+		<SQL> SELECT * FROM DML_30015_TABLE </SQL>
+		<RESULT>
+			<RECORD>
+				<COLUMN>1</COLUMN><COLUMN>ABC</COLUMN>
+			</RECORD>
+			<RECORD>
+				<COLUMN>3</COLUMN><COLUMN>ABCDEFG</COLUMN>
+			</RECORD>
+		</RESULT>
+	</SQL_CASE>
+	<SQL_CASE>
+		<SQL> UPDATE DML_30015_TABLE SET C0=C0/10, C1=&apos;ABC&apos; WHERE C0=1 </SQL>	
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT </TYPE><!-- 预期执行成功，并返回一个结果集，只验证给定值的长度 -->
+		<SQL> SELECT * FROM DML_30015_TABLE </SQL>
+		<RESULT>
+			<RECORD>
+				<COLUMN>0</COLUMN><COLUMN>ABC</COLUMN>
+			</RECORD>
+			<RECORD>
+				<COLUMN>3</COLUMN><COLUMN>ABCDEFG</COLUMN>
+			</RECORD>
+		</RESULT>
+	</SQL_CASE>
+	<SQL_CASE>
+		<SQL> UPDATE DML_30015_TABLE SET C0=(C0+1)*10, C1=&apos;ABC&apos; WHERE C0=0 </SQL>	
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT </TYPE><!-- 预期执行成功，并返回一个结果集，只验证给定值的长度 -->
+		<SQL> SELECT * FROM DML_30015_TABLE </SQL>
+		<RESULT>
+			<RECORD>
+				<COLUMN>10</COLUMN><COLUMN>ABC</COLUMN>
+			</RECORD>
+			<RECORD>
+				<COLUMN>3</COLUMN><COLUMN>ABCDEFG</COLUMN>
+			</RECORD>
+		</RESULT>
+	</SQL_CASE>
+	<!-- - - - - - - - - - - - 测试点1：结束 - - - - - - - - - - - -->
+	<TestPointBegin>测试点2：开始 </TestPointBegin>
+	<!-- 自定义函数 -->
+	<SQL_CASE>
+		<SQL> UPDATE DML_30015_TABLE SET C0=DML_30015_FUN1(), C1=DML_30015_FUN2() WHERE C0=10 </SQL>	
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT </TYPE><!-- 预期执行成功，并返回一个结果集，只验证给定值的长度 -->
+		<SQL> SELECT * FROM DML_30015_TABLE </SQL>
+		<RESULT>
+			<RECORD>
+				<COLUMN>2147483647</COLUMN><COLUMN>ABCDEFG</COLUMN>
+			</RECORD>
+			<RECORD>
+				<COLUMN>3</COLUMN><COLUMN>ABCDEFG</COLUMN>
+			</RECORD>
+		</RESULT>
+	</SQL_CASE>
+	<!-- - - - - - - - - - - - 测试点2：结束 - - - - - - - - - - - -->
+	<TestPointBegin>测试点3：开始 </TestPointBegin>
+	<!-- 集函数 -->
+	<SQL_CASE>
+		<SQL> UPDATE DML_30015_TABLE SET C0=MOD(C0,10), C1=LOWER(C1) WHERE C0=2147483647</SQL>	
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT </TYPE><!-- 预期执行成功，并返回一个结果集，只验证给定值的长度 -->
+		<SQL> SELECT * FROM DML_30015_TABLE </SQL>
+		<RESULT>
+			<RECORD>
+				<COLUMN>7</COLUMN><COLUMN>abcdefg</COLUMN>
+			</RECORD>
+			<RECORD>
+				<COLUMN>3</COLUMN><COLUMN>ABCDEFG</COLUMN>
+			</RECORD>
+		</RESULT>
+	</SQL_CASE>
+	<!-- - - - - - - - - - - - 测试点3：结束 - - - - - - - - - - - -->
+	
+	<CLEAR><!-- 脚本清除模块，该关键字标识清除块开始 -->
+		<SQL_CASE>
+			<SQL> DROP FUNCTION DML_30015_FUN1 </SQL>
+			<SQL> DROP FUNCTION DML_30015_FUN2 </SQL>			
+			<SQL> DROP TABLE DML_30015_TABLE </SQL>			
+		</SQL_CASE>
+	</CLEAR>
+</SQLTEST>

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<!--
+	修改记录列表
+	序号		修改类型		修改内容		修改人		修改日期
+	1								孙峰		2005/05/26
+	2               修改                 测试点1、2中的错误返回码   方静            2007-1-10
+	3		修改		     DM7里去掉了AT关键字	余俊美		2010-10-27						
+-->
+<!--
+	测试点列表
+	1.	表不存在
+	2.没有删除权限		
+-->
+<SQLTEST>
+	<CONTENT> 删除表对像的非法测例 </CONTENT><!-- 请在这里加入对脚本的简要描述 -->
+	<CONNECT></CONNECT><!-- 连接数据库 -->
+
+		<SQL_CASE>
+			<TYPE> DIRECT_EXECUTE_IGNORE </TYPE><!-- 不关心语句执行的结果 -->
+			<SQL> DROP USER DML_20006_USER CASCADE </SQL>
+			<SQL> DROP TABLE DML_20006_TABLE CASCADE </SQL>
+		</SQL_CASE>
+	<TestPointBegin>测试点1：开始 </TestPointBegin>
+	<!-- 表不存在 -->
+	<SQL_CASE>
+		<SQLSTATE> 42S02 </SQLSTATE><!-- 未找到基本表或视图 -->
+		<NERROR> -2106 </NERROR><!-- 无效的表名 -->
+		<TYPE> DIRECT_EXECUTE_FAIL </TYPE><!-- 预期执行失败 -->
+		<SQL> DELETE FROM DML_20006_TABLE </SQL><!-- 删除一个不存在的表中数据 -->		
+	</SQL_CASE>
+	<!-- - - - - - - - - - - - 测试点1：结束 - - - - - - - - - - - -->
+	<TestPointBegin>测试点2：开始 </TestPointBegin>
+	<!-- 没有删除权限 -->
+	<SQL_CASE>
+		<SQL> CREATE TABLE DML_20006_TABLE(C0 INT) </SQL><!-- 在当前库上创建一个测试表 -->
+		
+		<SQL> CREATE USER DML_20006_USER IDENTIFIED BY "1ABCDEFG1" </SQL><!-- 在当前库上新建一个用户，不给它访问SYSTEM库的权限 -->
+	</SQL_CASE>
+<!-- 	<NEWCONNECTEXECUTE> -->
+		<UID> DML_20006_USER </UID>
+		<PWD> 1ABCDEFG1 </PWD>
+		<CONNECT> </CONNECT>
+		<SQL_CASE>
+			<SQLSTATE> 42000 </SQLSTATE><!-- 语法错或访问非法 -->
+			<NERROR> -5502 </NERROR><!-- 无删除权限 -->			
+			<TYPE> DIRECT_EXECUTE_FAIL </TYPE><!-- 预期执行失败 -->					
+
+			<!-- 要做删除测试,需要指定要删除的表所在的模式名,否则报表不存在的错误 -->
+<!--			
+			<SQL>DELETE FROM DML_20006_TABLE</SQL>		
+--> 		
+			<SQL>DELETE FROM SYSDBA.DML_20006_TABLE</SQL>
+			
+ 		</SQL_CASE>
+ 		<DISCONNECT> </DISCONNECT>
+<!-- 	</NEWCONNECTEXECUTE> -->
+	<!-- - - - - - - - - - - - 测试点2：结束 - - - - - - - - - - - -->
+		
+	<CLEAR><!-- 脚本清除模块，该关键字标识清除块开始 -->
+		<SQL_CASE>
+			<SQL> DROP USER DML_20006_USER </SQL>
+			<SQL> DROP TABLE DML_20006_TABLE </SQL>
+
+		</SQL_CASE>
+	</CLEAR>
+</SQLTEST>

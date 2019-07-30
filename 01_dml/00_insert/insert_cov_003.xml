@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<!--
+-->
+<!--覆盖率-->
+<SQLTEST>
+	<CONTENT>  </CONTENT>
+	<UID> SYSDBA </UID>
+	<PWD> SYSDBA </PWD>
+	<DATABASE> SYSTEM </DATABASE>
+	<CONNECT> </CONNECT>
+	<SQL_CASE>
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE>
+		<SQL> DROP TABLE T_SELF_REF</SQL>
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE>
+		<SQL> create table T_SELF_REF (c1 bigint cluster primary key,foreign key(c1) REFERENCES T_SELF_REF(C2), c2 smallint UNIQUE, foreign key(c2) REFERENCES T_SELF_REF(C1),C3 INT); </SQL>
+		<SQL> insert into T_SELF_REF values(1, 1,111); </SQL>
+		<SQL> insert into T_SELF_REF values(3, 3,111); </SQL>
+		<SQL> insert into T_SELF_REF values(2, 2,111); </SQL>
+		<SQL> DELETE FROM T_SELF_REF WHERE C1=2; </SQL>
+
+		<TYPE> DIRECT_EXECUTE_FAIL </TYPE>
+		<SQL> insert into T_SELF_REF values(999999999999, 999999999999,111); </SQL>
+		<SQL> insert into T_SELF_REF values(4, null,null); </SQL>
+		<SQL> UPDATE T_SELF_REF SET C2=1; </SQL>
+
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE>
+		<SQL> DELETE FROM T_SELF_REF WHERE C1=1; </SQL>
+		<SQL> DELETE FROM T_SELF_REF WHERE C1=3; </SQL>
+		<SQL> DELETE FROM T_SELF_REF WHERE C1=1; </SQL>
+
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE>
+		<SQL> DROP TABLE T_SELF_REF; </SQL>
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE>
+		<SQL> create table T_SELF_REF (c1 int UNIQUE,foreign key(c1) REFERENCES T_SELF_REF(C2), c2 int UNIQUE, foreign key(c2) REFERENCES T_SELF_REF(C1),C3 INT); </SQL>
+		<SQL> insert into T_SELF_REF values(1, 1,111); </SQL>
+		<SQL> insert into T_SELF_REF values(2, 2,111); </SQL>
+		<SQL> insert into T_SELF_REF values(null, null,null); </SQL>
+		<SQL> UPDATE T_SELF_REF SET C1=C1+3,C2=C2+3; </SQL>
+		<SQL> DELETE FROM T_SELF_REF WHERE C1=4 </SQL>
+		<SQL> DELETE FROM T_SELF_REF WHERE C1 IS NULL </SQL>
+
+		<TYPE> DIRECT_EXECUTE_FAIL </TYPE>
+		<SQL> insert into T_SELF_REF values(1, NULL,111); </SQL>
+		<SQL> insert into T_SELF_REF values(NULL, 1,111); </SQL>
+		<SQL> insert into T_SELF_REF values(3, NULL,111); </SQL>
+		<SQL> insert into T_SELF_REF values(4, NULL,111); </SQL>
+		<SQL> insert into T_SELF_REF values(5, NULL,111); </SQL>
+		<SQL> insert into T_SELF_REF values(6, NULL,111); </SQL>
+		<SQL> insert into T_SELF_REF values(7, NULL,111); </SQL>
+		<SQL> insert into T_SELF_REF values(8, NULL,111); </SQL>
+		<SQL> insert into T_SELF_REF values(9, NULL,111); </SQL>
+		<SQL> insert into T_SELF_REF values(NULL, 1,111); </SQL>
+
+
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE>
+		<SQL> DROP TABLE T_SELF_REF </SQL>
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE>
+		<SQL> create table T_SELF_REF (c1 int primary key,c2 int REFERENCES T_SELF_REF(C1),C3 INT); </SQL>
+		<SQL> insert into T_SELF_REF values(1, 1,111); </SQL>
+		<SQL> insert into T_SELF_REF values(2, 2,111); </SQL>
+		<SQL> insert into T_SELF_REF values(3, null,111); </SQL>
+		<SQL> insert into T_SELF_REF values(4, 1,111); </SQL>
+		<SQL> insert into T_SELF_REF values(5, 4,111); </SQL>
+
+	</SQL_CASE>
+	<CLEAR>
+		<SQL_CASE>
+		<SQL> DROP TABLE T_SELF_REF </SQL>
+		</SQL_CASE>
+	</CLEAR>
+	<DISCONNECT> </DISCONNECT>
+
+</SQLTEST> 

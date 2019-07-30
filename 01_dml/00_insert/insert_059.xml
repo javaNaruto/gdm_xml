@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<!--
+	修改记录列表
+	序号		修改类型		修改内容		修改人		修改日期
+	1								孙峰		2005/05/09						
+-->
+<!--
+	测试点列表
+	1.函数		
+-->
+<SQLTEST>
+	<CONTENT> 测试插入值为函数的情况 </CONTENT><!-- 请在这里加入对脚本的简要描述 -->
+	<CONNECT></CONNECT><!-- 连接数据库 -->
+	<SQL_CASE>
+		<SQL> CREATE TABLE DML_10017_TABLE(C0 INT, C1 VARCHAR(100)) </SQL>
+		<SQL> CREATE OR REPLACE FUNCTION DML_10017_FUN1 RETURN INT 
+			AS 
+			S1 INT; 
+			BEGIN 
+			S1:=2147483647;
+			RETURN S1; 
+			END; </SQL>
+		<SQL> CREATE OR REPLACE FUNCTION DML_10017_FUN2 RETURN VARCHAR(100) 
+			AS 
+			S1 VARCHAR(100); 
+			BEGIN 
+			S1:='ABCDEFG'; 
+			RETURN S1; 
+			END; </SQL>
+
+	</SQL_CASE>
+	<TestPointBegin>测试点1：开始 </TestPointBegin>
+	<!-- 函数 -->
+	<SQL_CASE>
+		<SQL> INSERT INTO DML_10017_TABLE VALUES(DML_10017_FUN1(), DML_10017_FUN2()); </SQL>
+	</SQL_CASE>
+	<SQL_CASE>
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT </TYPE><!-- 预期执行成功，并返回一个结果集，只验证给定值的长度 -->
+		<SQL> SELECT * FROM DML_10017_TABLE </SQL>
+		<RESULT>
+			<RECORD>
+				<COLUMN>2147483647</COLUMN><COLUMN>ABCDEFG</COLUMN>
+			</RECORD>
+		</RESULT>
+	</SQL_CASE>
+	
+
+	<CLEAR><!-- 脚本清除模块，该关键字标识清除块开始 -->
+		<SQL_CASE>
+			<SQL> DROP TABLE DML_10017_TABLE </SQL>
+			<SQL> DROP FUNCTION DML_10017_FUN1 </SQL>
+			<SQL> DROP FUNCTION DML_10017_FUN2 </SQL>
+
+		</SQL_CASE>
+	</CLEAR>
+</SQLTEST>

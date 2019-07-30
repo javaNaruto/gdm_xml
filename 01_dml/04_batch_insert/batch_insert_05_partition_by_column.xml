@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<!--
+	修改记录列表
+	序号		修改类型		修改内容		修改人		修改日期
+	1		创建						范晓燕		2011-7-6																	
+-->
+<!--
+	测试点列表
+	1.		
+-->
+<SQLTEST>
+	<CONTENT>  </CONTENT><!-- 请在这里加入对脚本的简要描述 -->
+	<CONNECT></CONNECT><!-- 连接数据库 -->	
+	<TestPointBegin> 测试点1：开始 </TestPointBegin>
+	<SQL_CASE>	
+	<TYPE> DIRECT_EXECUTE_IGNORE </TYPE><!-- 不关心语句执行的结果 -->
+	<SQL> DROP TABLE T_COLUMN; </SQL>
+	
+	<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+	<SQL> CREATE TABLE T_COLUMN(C1 INT,C2 CHAR,C3 VARCHAR(128),C4 TIME,C5 DATE)PARTITION BY COLUMN((C1), (C2, C3),(C4,C5)); </SQL>
+	
+	<!-- 不支持垂直分区数据多行插入 -->
+	<TYPE> DIRECT_EXECUTE_FAIL </TYPE><!-- 预期执行失败 -->	
+	<SQL> INSERT INTO T_COLUMN VALUES(99,'A','AAA','12:12:22','2011-7-6'),(199,'B','BBB','12:12:25','2011-7-5'),(299,'C','CCC','12:12:28','2011-7-7'); </SQL>	
+			
+	</SQL_CASE>
+	
+	<CLEAR><!-- 脚本清除模块，该关键字标识清除块开始 -->
+		<SQL_CASE>
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE><!-- 不关心语句执行的结果 -->
+		<SQL> DROP TABLE T_COLUMN; </SQL>	
+		</SQL_CASE>
+	</CLEAR>
+</SQLTEST> 

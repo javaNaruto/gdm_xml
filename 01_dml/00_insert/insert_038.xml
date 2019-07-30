@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<!--
+	修改记录列表
+	序号		修改类型		修改内容		修改人		修改日期
+	1		创建			创建文件		与君没		2010-9-14																
+-->
+<!--
+	测试点列表
+	1.表上有多个BS触发器的情况		
+-->
+<SQLTEST>
+	<CONTENT>  </CONTENT><!-- 请在这里加入对脚本的简要描述 -->
+	<CONNECT></CONNECT><!-- 连接数据库 -->
+	<TestPointBegin> 测试点1：开始 </TestPointBegin>
+	<SQL_CASE>
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE><!-- 不关心语句执行的结果 -->
+		<SQL> DROP TABLE T1_INSERT0502 CASCADE; </SQL>
+		<SQL> DROP TABLE T2_INSERT0502 CASCADE; </SQL>
+		<SQL> DROP TRIGGER TR1_INSERT0502 CASCADE; </SQL>
+		<SQL> DROP TRIGGER TR2_INSERT0502 CASCADE; </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> CREATE TABLE T1_INSERT0502(C1 INT); </SQL>
+		<SQL> CREATE TABLE T2_INSERT0502(C1 INT); </SQL>
+		<SQL> create trigger TR1_INSERT0502 before insert on T1_INSERT0502 begin insert into T2_INSERT0502 values(1); end; </SQL>
+		<SQL> create trigger TR2_INSERT0502 before insert on T1_INSERT0502 begin insert into T2_INSERT0502 values(1); end; </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> INSERT INTO T1_INSERT0502 VALUES(1); </SQL>
+		
+	</SQL_CASE>
+	<CLEAR><!-- 脚本清除模块，该关键字标识清除块开始 -->
+		<SQL_CASE>
+			<SQL> DROP TABLE T1_INSERT0502 CASCADE; </SQL>
+			<SQL> DROP TABLE T2_INSERT0502 CASCADE; </SQL>
+			<SQL> DROP TRIGGER TR1_INSERT0502 CASCADE; </SQL>
+			<SQL> DROP TRIGGER TR2_INSERT0502 CASCADE; </SQL>
+		</SQL_CASE>
+	</CLEAR>
+</SQLTEST> 

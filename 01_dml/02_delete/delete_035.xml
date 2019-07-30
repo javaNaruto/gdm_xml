@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<!--
+	修改记录列表
+	序号		修改类型		修改内容		修改人		修改日期
+	1               创建                    创建测试用例            梁薇            2008-11-11	
+       2               修改                    修改部分测试嗲          沈成            2011-9-13																
+-->
+<!--
+	测试点列表
+	1.	opt_trunc_temporary
+	2.      opt_trunc_table
+	3.      xtrct_exec_trct	
+-->
+<SQLTEST>
+	<CONTENT>  </CONTENT><!-- 请在这里加入对脚本的简要描述 -->
+	<CONNECT></CONNECT><!-- 连接数据库 -->
+	
+	<TestPointBegin> 测试点1：开始 </TestPointBegin>
+	<SQL_CASE>
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE><!-- 预期执行成功 -->
+		<SQL> drop table ##t1_dml_20025; </SQL>					
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> create table ##t1_dml_20025(c int); </SQL>
+		<SQL> insert into ##t1_dml_20025 values(1); </SQL>
+		<SQL> insert into ##t1_dml_20025 values(1); </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> truncate table ##t1_dml_20025; </SQL>		
+	</SQL_CASE>
+	
+	<TestPointBegin> 测试点2：开始 </TestPointBegin>
+	<SQL_CASE>
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> create table t2_dml_20025(c int); </SQL>
+		<SQL> insert into t2_dml_20025 values(1); </SQL>
+		<SQL> truncate table t2_dml_20025; </SQL>				
+	</SQL_CASE>
+
+	<SQL_CASE>
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> create table t3_dml_20025(c1 int, c2 clob); </SQL>
+		<SQL> insert into t3_dml_20025 values(1, &apos;aaa&apos;); </SQL>
+		<SQL> truncate table t3_dml_20025; </SQL>		
+	</SQL_CASE>
+	
+	<TestPointBegin> 测试点3：开始 </TestPointBegin>
+	<SQL_CASE>
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> create table t4_dml_20025(c1 int cluster primary key, c2 int, c3 int,c4 int) partition by column ((c1,c2), (c3,c4)); </SQL>
+		<SQL> truncate table t4_dml_20025; </SQL>		
+	</SQL_CASE>
+
+	
+	<CLEAR><!-- 脚本清除模块，该关键字标识清除块开始 -->
+		<SQL_CASE>
+			<LOOP>
+				<TIMES> 4 </TIMES>
+				<SQL> drop table t@TIMES_dml_20025; </SQL>				
+			</LOOP>
+			<SQL> drop table ##t1_dml_20025; </SQL>				
+		</SQL_CASE>
+	</CLEAR>
+</SQLTEST> 

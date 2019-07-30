@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="GB2312"?>
+<!-- 
+	 	修改记录列表
+	 	序号		修改类型		修改内容		修改人		修改日期
+	 	1			创建			创建文件		刘坚		2010-07-23
+              2                   修改                 修改部分测试点       沈成           2011-9-13
+-->
+<!-- 
+		测试点列表
+		1.与空记录进行乘操作并更新验证	(已完成)
+		2.视图更新验证	(已完成)
+ -->
+
+<SQLTEST>
+	<CONTENT>与空记录进行乘操作并更新 测试</CONTENT>
+	 <CONNECT></CONNECT><!-- 连接数据库 -->
+	
+       <SQL_CASE>
+           <TYPE>DIRECT_EXECUTE_IGNORE</TYPE>
+           <SQL>drop table t1 cascade;</SQL>
+           <SQL>drop table t2 cascade;</SQL>
+       </SQL_CASE>
+
+	<SQL_CASE>
+              <TYPE>DIRECT_EXECUTE_SUCCESS</TYPE>
+		<SQL>create table t1(c1 int, c2 int);</SQL>
+		<SQL>create table t2(c1 int, c2 int);</SQL>
+		<SQL>insert into t1 values(1,1);</SQL>
+		<SQL>insert into t1 values(2,2);</SQL>
+		<SQL>insert into t1 values(3,3);</SQL>
+		<SQL>insert into t1 values(4,4);</SQL>
+		<SQL>insert into t2 values(1,1);</SQL>
+		<SQL>insert into t2 values(2,2);</SQL>
+		<SQL>insert into t2 values(3,3);</SQL>
+		<SQL>commit;</SQL>
+		<SQL>update t1 set c1 = (select c1 * c2 from t2 where t1.c1 = t2.c1) where c2 >=4 ;</SQL>
+	</SQL_CASE>
+	  
+	<TestPointBegin>测试点1：与空记录进行乘操作并更新验证@ </TestPointBegin>
+	
+	<SQL_CASE><!-- DM6的结果有误 -->
+		<TYPE>DIRECT_EXECUTE_SELECT_COMPARE_RESULT</TYPE><!-- 预期执行结果：返回成功-->
+		<SQL>select * from t1;</SQL>
+		<RESULT>
+			<RECORD>
+				<COLUMN>1</COLUMN>
+				<COLUMN>1</COLUMN>
+			</RECORD>
+			<RECORD>
+				<COLUMN>2</COLUMN>
+				<COLUMN>2</COLUMN>
+			</RECORD>
+			<RECORD>
+				<COLUMN>3</COLUMN>
+				<COLUMN>3</COLUMN>
+			</RECORD>
+			<RECORD>
+				<COLUMN>NULL</COLUMN>
+				<COLUMN>4</COLUMN>
+			</RECORD>
+		</RESULT>
+		
+	</SQL_CASE>
+	
+	<SQL_CASE>
+           <TYPE>DIRECT_EXECUTE_IGNORE</TYPE>
+           <SQL>drop table tt cascade;</SQL>
+           <SQL> drop view v1 cascade; </SQL>
+       </SQL_CASE>
+       
+	<SQL_CASE>
+		<SQL>create table tt(c1 int, c2 int);</SQL>
+		<SQL>insert into tt values(10, 1);</SQL>
+		<SQL>insert into tt values(1,  10);</SQL>
+		<SQL>create view v1 as select * from tt order by c1;</SQL>
+		<SQL>update v1 set c1 = c1*10 where c2 = 1;</SQL>
+	</SQL_CASE>
+	  
+	<TestPointBegin>测试点2：视图更新验证@ </TestPointBegin>
+	
+	<SQL_CASE><!-- dm6的结果有误 -->
+		<TYPE>DIRECT_EXECUTE_SELECT_COMPARE_RESULT</TYPE><!-- 预期执行结果：返回成功-->
+		<SQL>select * from tt;</SQL>
+		<RESULT>
+			<RECORD>
+				<COLUMN>100</COLUMN>
+				<COLUMN>1</COLUMN>
+			</RECORD>
+			<RECORD>
+				<COLUMN>1</COLUMN>
+				<COLUMN>10</COLUMN>
+			</RECORD>
+		</RESULT>
+		
+	</SQL_CASE>
+
+	<CLEAR><!-- 测试用例清除块，该关键字标识清除块开始。如果上面某条语句执行出错后，程序会自动跳到这块来做环境清除工作 -->
+		<SQL_CASE>
+			<TYPE>DIRECT_EXECUTE_SUCCESS</TYPE>
+			<SQL>drop table t1;</SQL>
+			<SQL>drop table t2;</SQL>
+			<SQL>drop view v1;</SQL>
+			<SQL>drop table tt;</SQL>
+		</SQL_CASE>
+	</CLEAR>
+</SQLTEST>

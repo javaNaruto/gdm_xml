@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<!--
+	修改记录列表
+	序号		修改类型		修改内容		修改人		修改日期
+	1		创建			创建文件		余俊美		2010-6-22
+       2             修改                 修改部分测试点       沈成          2011-9-13																
+-->
+<!--
+	测试点列表
+	1.测试表上建索引更新的情况		
+-->
+<SQLTEST>
+	<CONTENT>  </CONTENT><!-- 请在这里加入对脚本的简要描述 -->
+	<CONNECT></CONNECT><!-- 连接数据库 -->
+	<TestPointBegin> 测试点1：开始 </TestPointBegin>
+	<SQL_CASE>
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE><!-- 不关心语句执行的结果 -->
+		<SQL> drop table t1_update1002 cascade; </SQL>
+		<SQL> drop table i11_update1002 cascade; </SQL>
+		<SQL> drop table i12_update1002 cascade; </SQL>
+		<SQL> drop table i13_update1002 cascade; </SQL>
+		<SQL> drop table i14_update1002 cascade; </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> create table t1_update1002(c1 int); </SQL>
+		<SQL> insert into t1_update1002 values(1); </SQL>
+		<SQL> insert into t1_update1002 values(2); </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> create cluster index i11_update1002 on t1_update1002(c1); </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> update t1_update1002 set c1 = 1; </SQL>
+		<SQL> delete from t1_update1002; </SQL>
+		<SQL> insert into t1_update1002 values(1); </SQL>
+		<SQL> insert into t1_update1002 values(2); </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> create not partial index i12_update1002 on t1_update1002(c1); </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> update t1_update1002 set c1 = 1; </SQL>
+		<SQL> delete from t1_update1002; </SQL>
+		<SQL> insert into t1_update1002 values(1); </SQL>
+		<SQL> insert into t1_update1002 values(2); </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> create bitmap index i14_update1002 on t1_update1002(c1); </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> update t1_update1002 set c1 = 1; </SQL>
+		<SQL> delete from t1_update1002; </SQL>
+		<SQL> insert into t1_update1002 values(1); </SQL>
+		<SQL> insert into t1_update1002 values(2); </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> create unique index i13_update1002 on t1_update1002(c1); </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_FAIL </TYPE><!-- 预期执行失败 -->
+		<SQL> update t1_update1002 set c1 = 1; </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> delete from t1_update1002; </SQL>
+		<SQL> insert into t1_update1002 values(1); </SQL>
+		<SQL> insert into t1_update1002 values(2); </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> update t1_update1002 set c1 = 3 where c1 = 1; </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL </TYPE><!-- 预期执行成功，并返回一个结果集，验证全字匹配长度 -->
+		<SQL> select * from t1_update1002; </SQL>
+		<RESULT>
+			<RECORD>
+				<COLUMN>2</COLUMN>
+			</RECORD>
+			<RECORD>
+				<COLUMN>3</COLUMN>
+			</RECORD>
+		</RESULT>
+		
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> drop index i11_update1002 cascade; </SQL>
+		<SQL> drop index i12_update1002 cascade; </SQL>
+		<SQL> drop index i13_update1002 cascade; </SQL>
+		<SQL> drop index i14_update1002 cascade; </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> delete from t1_update1002; </SQL>
+		<SQL> insert into t1_update1002 values(1); </SQL>
+		<SQL> insert into t1_update1002 values(2); </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> create unique index i13_update1002 on t1_update1002(c1); </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_FAIL </TYPE><!-- 预期执行失败 -->
+		<SQL> update t1_update1002 set c1 = 1; </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> delete from t1_update1002; </SQL>
+		<SQL> insert into t1_update1002 values(1); </SQL>
+		<SQL> insert into t1_update1002 values(2); </SQL>
+
+	</SQL_CASE>
+	<CLEAR><!-- 脚本清除模块，该关键字标识清除块开始 -->
+		<SQL_CASE>
+			<SQL> drop table t1_update1002 cascade; </SQL>
+			<SQL> drop index i11_update1002 cascade; </SQL>
+			<SQL> drop index i12_update1002 cascade; </SQL>
+			<SQL> drop index i13_update1002 cascade; </SQL>
+			<SQL> drop index i14_update1002 cascade; </SQL>
+		</SQL_CASE>
+	</CLEAR>
+</SQLTEST> 

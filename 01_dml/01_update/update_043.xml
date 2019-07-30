@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<!--
+	修改记录列表
+	序号		修改类型		修改内容		修改人		修改日期
+	1								孙峰		2005/05/17						
+-->
+<!--
+	测试点列表
+	1.常用条件表达式
+	2.子查询		
+-->
+<SQLTEST>
+	<CONTENT> 更新语句带条件表达式 </CONTENT><!-- 请在这里加入对脚本的简要描述 -->
+	<CONNECT></CONNECT><!-- 连接数据库 -->
+	<TestPointBegin>测试点1：开始 </TestPointBegin>
+	<SQL_CASE>
+		<SQL> CREATE TABLE DML_30021_TABLE(C0 INT, C1 FLOAT, C2 CHAR(100), C3 TIMESTAMP) </SQL>
+		<SQL> INSERT INTO DML_30021_TABLE VALUES(1, 0.123456789012345, &apos;ABCDEFGHIJKMN&apos;, &apos;2005-05-17 11:11:11&apos;) </SQL>
+		<SQL> INSERT INTO DML_30021_TABLE SELECT * FROM DML_30021_TABLE </SQL>
+		<SQL> INSERT INTO DML_30021_TABLE VALUES(2, 0.123456789012345, &apos;ABCDEFGHIJKMN&apos;, &apos;2005-05-17 11:11:11&apos;) </SQL>
+		<SQL> INSERT INTO DML_30021_TABLE SELECT * FROM DML_30021_TABLE </SQL>		
+	</SQL_CASE>
+	<SQL_CASE><!-- 测试是否全部更新 -->
+		<SQL> UPDATE DML_30021_TABLE SET C0=1, C1 = 123456789012345, C2=&apos;ABCDEFGHIJKMNO&apos;, C3=&apos;2005-05-17 11:11:11&apos;
+		WHERE C0=1 AND C1&lt;1 AND C2&gt;=&apos;ABCDEFGHIJKMN&apos;</SQL>
+		<EFFECTROWS>4</EFFECTROWS>
+	</SQL_CASE>
+	<!-- - - - - - - - - - - - 测试点1：结束 - - - - - - - - - - - -->
+	<TestPointBegin>测试点2：开始 </TestPointBegin>
+	<!-- 子查询 -->
+	<SQL_CASE>
+		<SQL> CREATE TABLE DML_30021_TEMP(C0 INT, C1 FLOAT, C2 CHAR(100), C3 TIMESTAMP) </SQL>
+		<SQL> INSERT INTO DML_30021_TEMP VALUES(2, 0.123456789012345, &apos;ABCDEFGHIJKMN&apos;, &apos;2005-05-17 11:11:11&apos;) </SQL>
+
+	</SQL_CASE>
+	<SQL_CASE><!-- 测试更新执行以后，影响的行数是否正确 -->
+		<SQL> UPDATE DML_30021_TABLE SET C0=1, C1 = 123456789012345, C2=&apos;ABCDEFGHIJKMNO&apos;, C3=&apos;2005-05-17 11:11:11&apos;
+		WHERE C0 IN(SELECT C0 FROM DML_30021_TEMP) </SQL><!-- 表中有两行C0列的值为2 -->
+		<EFFECTROWS>2</EFFECTROWS>
+	</SQL_CASE>
+	<SQL_CASE><!-- 测试更新执行以后，影响的行数是否正确 -->
+		<SQL> UPDATE DML_30021_TABLE SET C0=1, C1 = 123456789012345, C2=&apos;ABCDEFGHIJKMNO&apos;, C3=&apos;2005-05-17 11:11:11&apos;
+		WHERE C0 IN(SELECT C0 FROM DML_30021_TABLE) </SQL><!-- 表中一共有六行，所以影得的行数为6 -->
+		<EFFECTROWS>6</EFFECTROWS>
+	</SQL_CASE>
+	<!-- - - - - - - - - - - - 测试点2：结束 - - - - - - - - - - - -->
+	
+	<CLEAR><!-- 脚本清除模块，该关键字标识清除块开始 -->
+		<SQL_CASE>
+			<SQL> DROP TABLE DML_30021_TABLE </SQL>
+			<SQL> DROP TABLE DML_30021_TEMP </SQL>
+
+		</SQL_CASE>
+	</CLEAR>
+</SQLTEST>

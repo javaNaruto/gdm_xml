@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<!--
+	修改记录列表
+	序号		修改类型		修改内容		修改人		修改日期
+	1								孙峰		2005/05/12						
+-->
+<!--
+	测试点列表
+	2.用模式名来修饰表名
+	3.单用表名		
+-->
+<SQLTEST>
+	<CONTENT> 数据删除对像名修饰 </CONTENT><!-- 请在这里加入对脚本的简要描述 -->
+	<CONNECT></CONNECT><!-- 连接数据库 -->
+	<TestPointBegin>测试点2：开始 </TestPointBegin>
+	<!-- 模式名来修饰 -->
+	<SQL_CASE>
+		<SQL> CREATE SCHEMA DML_20005_SCHEMA </SQL><!-- 创建一个模式用来建测试表 -->		
+		<SQL> CREATE TABLE DML_20005_SCHEMA.DML_20005_TABLE(C0 INT) </SQL>
+		<SQL> CREATE VIEW DML_20005_SCHEMA.DML_20005_VIEW AS SELECT * FROM DML_20005_SCHEMA.DML_20005_TABLE</SQL>
+		<SQL> INSERT INTO DML_20005_SCHEMA.DML_20005_TABLE VALUES(NULL) </SQL>
+		<SQL> INSERT INTO DML_20005_SCHEMA.DML_20005_TABLE VALUES(1) </SQL>
+		<SQL> DELETE FROM DML_20005_SCHEMA.DML_20005_TABLE WHERE C0 = 1</SQL><!-- 删除指定模式名表对像中的数据 -->
+		<!-- 验证结果 -->
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT </TYPE><!-- 预期执行成功，并返回一个结果集，只验证给定值的长度 -->		
+		<SQL> SELECT * FROM DML_20005_SCHEMA.DML_20005_TABLE </SQL>
+		<RESULT><!--  -->
+			<RECORD>
+				<COLUMN>NULL</COLUMN>
+			</RECORD>			
+		</RESULT>
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> DELETE FROM DML_20005_SCHEMA.DML_20005_TABLE</SQL><!-- 删除指定模式名表对像中的数据 -->
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT </TYPE><!-- 预期执行成功，并返回一个结果集，只验证给定值的长度 -->
+		<SQL> SELECT * FROM DML_20005_SCHEMA.DML_20005_TABLE  </SQL>
+		<RESULT><!-- (插入的结果集是一个空结果集) -->
+		</RESULT>
+	</SQL_CASE>
+	<!-- - - - - - - - - - - - 测试点2：结束 - - - - - - - - - - - -->
+	<TestPointBegin>测试点3：开始 </TestPointBegin>
+	<!-- 不用修饰 -->
+	<SQL_CASE>
+		<SQL> CREATE TABLE DML_20005_TABLE(C0 INT) </SQL>
+		<SQL> CREATE VIEW DML_20005_VIEW AS SELECT * FROM DML_20005_TABLE </SQL>
+		<SQL> INSERT INTO DML_20005_TABLE VALUES(1) </SQL>
+		<SQL> INSERT INTO DML_20005_TABLE VALUES(2) </SQL>
+		<SQL> DELETE FROM DML_20005_TABLE WHERE C0 = 1</SQL>
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT </TYPE><!-- 预期执行成功，并返回一个结果集，只验证给定值的长度 -->
+		<SQL> SELECT * FROM DML_20005_TABLE </SQL>
+		<RESULT>
+			<RECORD>
+				<COLUMN>2</COLUMN>
+			</RECORD>
+		</RESULT>
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> DELETE FROM DML_20005_VIEW</SQL>
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT </TYPE><!-- 预期执行成功，并返回一个结果集，只验证给定值的长度 -->
+		<SQL> SELECT * FROM DML_20005_TABLE </SQL>
+		<RESULT><!-- (插入的结果集是一个空结果集) -->
+		</RESULT>
+	</SQL_CASE>
+	<!-- - - - - - - - - - - - 测试点3：结束 - - - - - - - - - - - -->
+	
+	<CLEAR><!-- 脚本清除模块，该关键字标识清除块开始 -->
+		<SQL_CASE>
+			<SQL> DROP VIEW DML_20005_SCHEMA.DML_20005_VIEW </SQL>
+			<SQL> DROP TABLE DML_20005_SCHEMA.DML_20005_TABLE </SQL>			
+			<SQL> DROP SCHEMA DML_20005_SCHEMA </SQL>	
+			<SQL> DROP VIEW DML_20005_VIEW </SQL>		
+			<SQL> DROP TABLE DML_20005_TABLE </SQL>			
+		</SQL_CASE>
+	</CLEAR>
+</SQLTEST>

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<!--
+	修改记录列表
+	序号		修改类型		修改内容		修改人		修改日期
+	1								孙峰		2005/05/12						
+-->
+<!--
+	测试点列表
+	1.更新语句对像(表)支持指定库名		     
+	2.更新句对像(表)支持指定模式名
+	3.不带修饰
+-->
+<SQLTEST>
+	<CONTENT> 更新表名带库名和模式名 </CONTENT><!-- 请在这里加入对脚本的简要描述 -->
+	<CONNECT></CONNECT><!-- 连接数据库 -->
+	<SQL_CASE>
+		<SQL> CREATE TABLE DML_30005_TABLE(C0 INT, C1 INT); </SQL>
+		<SQL> INSERT INTO DML_30005_TABLE VALUES(1, 1)</SQL>
+	</SQL_CASE>
+	<TestPointBegin>测试点1：开始 </TestPointBegin>
+	<!-- 更新语句对像(表)支持指定库名 -->
+	<SQL_CASE>
+		<SQL> UPDATE @SCHEMA.DML_30005_TABLE SET C0=2, C1=2 </SQL>
+		<EFFECTROWS> 1 </EFFECTROWS>
+		<SQL> UPDATE @SCHEMA.DML_30005_TABLE SET C0=1, C1=1 WHERE C0=2 AND C1=2</SQL>
+		<EFFECTROWS> 1 </EFFECTROWS>	
+	</SQL_CASE>
+	<!-- - - - - - - - - - - - 测试点1：结束 - - - - - - - - - - - -->
+	<TestPointBegin>测试点2：开始 </TestPointBegin>
+	<!-- 模式名修饰 -->
+	<SQL_CASE>
+		<SQL> CREATE SCHEMA DML_30005_SCHEMA  </SQL><!-- 新建一个模式，用来测试模式名修饰 -->
+		<SQL> CREATE TABLE DML_30005_SCHEMA.DML_30005_TABLE(C0 INT, C1 INT);  </SQL><!-- 在新的模式上建测试表，用来测试更新 -->
+		<SQL> INSERT INTO DML_30005_SCHEMA.DML_30005_TABLE VALUES(1, 1) </SQL>
+		<SQL> UPDATE DML_30005_SCHEMA.DML_30005_TABLE SET C0=3, C1=3 WHERE C0=1 </SQL><!-- 测试指定模式名的更新操作 -->
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT </TYPE><!-- 预期执行成功，并返回一个结果集，只验证给定值的长度 --><!-- 检查更新的效果 -->
+		<SQL> SELECT * FROM DML_30005_SCHEMA.DML_30005_TABLE </SQL>
+		<RESULT>
+			<RECORD>
+				<COLUMN>3</COLUMN><COLUMN>3</COLUMN>
+			</RECORD>
+		</RESULT>		
+	</SQL_CASE>
+	<!-- - - - - - - - - - - - 测试点2：结束 - - - - - - - - - - - -->
+	<TestPointBegin>测试点3：开始 </TestPointBegin>
+	<!-- 不带修饰 -->
+	<SQL_CASE>
+		<SQL> UPDATE DML_30005_TABLE SET C0=4, C1=4 WHERE C0=1 </SQL><!-- 测试指定模式名的更新操作 -->
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT </TYPE><!-- 预期执行成功，并返回一个结果集，只验证给定值的长度 --><!-- 检查更新的效果 -->
+		<SQL> SELECT * FROM DML_30005_TABLE </SQL>
+		<RESULT>
+			<RECORD>
+				<COLUMN>4</COLUMN><COLUMN>4</COLUMN>
+			</RECORD>
+		</RESULT>
+	</SQL_CASE>
+	<!-- - - - - - - - - - - - 测试点3：结束 - - - - - - - - - - - -->
+	
+	<CLEAR><!-- 脚本清除模块，该关键字标识清除块开始 -->
+		<SQL_CASE>
+			<SQL> DROP TABLE DML_30005_TABLE </SQL>
+			<SQL> DROP TABLE DML_30005_SCHEMA.DML_30005_TABLE </SQL>
+			<SQL> DROP SCHEMA DML_30005_SCHEMA</SQL>				
+		</SQL_CASE>
+	</CLEAR>
+</SQLTEST>

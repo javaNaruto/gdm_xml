@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<!--
+	修改记录列表
+	序号		修改类型		修改内容		修改人		修改日期
+	1								孙峰		2005/05/26						
+-->
+<!--
+	测试点列表
+	1.	过程生成的结果集和被插入的表数据类型不匹配
+	2.过程生成的结果集和被插入的表数据列数不匹配
+	
+-->
+<SQLTEST>
+	<CONTENT> 插入过程结果集的非法测例 </CONTENT><!-- 请在这里加入对脚本的简要描述 -->
+	<CONNECT></CONNECT><!-- 连接数据库 -->
+	<SQL_CASE>
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE><!-- 不关心语句执行的结果 -->
+		<SQL> DROP TABLE DML_10026_TEMP CASCADE; </SQL>
+		
+	</SQL_CASE>
+	<SQL_CASE>
+		<SQL> CREATE TABLE DML_10026_TEMP(C0 INT, C1 VARCHAR(100)) </SQL>
+		<SQL> INSERT INTO DML_10026_TEMP VALUES(1, &apos;ABCDEFG&apos;) </SQL>
+		<SQL> INSERT INTO DML_10026_TEMP VALUES(2, &apos;ABCDEFG&apos;) </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_FAIL </TYPE><!-- 预期执行失败 -->
+		<SQL> CREATE OR REPLACE FUNCTION DML_10026_FUN RETURN INT 
+			AS 
+			S1 INT; 
+			BEGIN 
+			S1:=2147483647;
+			SELECT C0, C0, C1 FROM DML_10026_TEMP WHERE C0 = 1;
+			RETURN S1; 
+			END; </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> CREATE OR REPLACE PROCEDURE DML_10026_PRO_1
+			AS 			
+			BEGIN 
+			SELECT C0 FROM DML_10026_TEMP WHERE C0 = 1;
+			END; </SQL><!-- 1个结果集 -->
+		<SQL> CREATE OR REPLACE PROCEDURE DML_10026_PRO_2
+			AS 			
+			BEGIN 
+			SELECT C1, C0 FROM DML_10026_TEMP WHERE C0 = 1;
+			END; </SQL><!-- 2个空结果集 -->
+		<SQL> CREATE TABLE DML_10026_TABLE(C0 INT, C1 VARCHAR(100)) </SQL>
+	</SQL_CASE>
+
+	<TestPointBegin>测试点1：开始 </TestPointBegin>
+	<!-- 过程生成的结果集和被插入的表数据类型不匹配 -->
+	<SQL_CASE>
+		<SQLSTATE> 21S01 </SQLSTATE><!-- 将插入值列表与列的列表不匹配 -->
+		<TYPE> DIRECT_EXECUTE_FAIL </TYPE><!-- 预期执行失败 -->
+		
+		<SQL> INSERT INTO DML_10026_TABLE CALL DML_10026_FUN</SQL>
+		<SQL> INSERT INTO DML_10026_TABLE CALL DML_10026_PRO_1</SQL>
+
+	</SQL_CASE>
+	
+
+	<TestPointBegin>测试点2：开始 </TestPointBegin>
+	<!-- 过程生成的结果集和被插入的表数据列数不匹配 -->
+	<SQL_CASE>
+		<TYPE> DIRECT_EXECUTE_FAIL </TYPE><!-- 预期执行失败 -->		
+		<SQL> INSERT INTO DML_10026_TABLE CALL DML_10026_PRO_2</SQL>
+	</SQL_CASE>
+	<SQL_CASE>
+		<SQL> DELETE FROM DML_10026_TABLE </SQL>
+		
+	</SQL_CASE>
+	
+
+	<CLEAR><!-- 脚本清除模块，该关键字标识清除块开始 -->
+		<SQL_CASE>
+			<SQL> DROP TABLE DML_10026_TEMP </SQL>
+			<SQL> DROP TABLE DML_10026_TABLE </SQL>
+			<SQL> DROP FUNCTION DML_10026_FUN </SQL>
+			<SQL> DROP PROCEDURE DML_10026_PRO_1 </SQL>
+			<SQL> DROP PROCEDURE DML_10026_PRO_2 </SQL>
+			
+		</SQL_CASE>
+	</CLEAR>
+</SQLTEST>

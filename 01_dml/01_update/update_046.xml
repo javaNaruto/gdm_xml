@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<!--
+	修改记录列表
+	序号		修改类型		修改内容		修改人		修改日期
+	1	创建	更新索引列数据，导致数据查询不正确(SMR_WHL_07082901)	韩东	2007-09-06														
+-->
+<!--
+	测试点列表
+	1.更新索引列数据,检查结果
+-->
+<SQLTEST>
+	<CONTENT>  更新索引列数据</CONTENT><!-- 请在这里加入对脚本的简要描述 -->
+	<CONNECT></CONNECT><!-- 连接数据库 -->
+	<TestPointBegin>测试点1：开始 </TestPointBegin>
+	<SQL_CASE>
+	<SQL> CREATE TABLE T01_DML_30040(C1 INT,C2 INT); </SQL>
+	<SQL> CREATE INDEX IND_DML_30040 ON T01_DML_30040(C1); </SQL>
+	<SQL> INSERT INTO T01_DML_30040 VALUES(1,1); </SQL>
+	<SQL> INSERT INTO T01_DML_30040 VALUES(2,2);  </SQL>
+	<SQL> INSERT INTO T01_DML_30040 VALUES(3,3);  </SQL>
+	<SQL> UPDATE T01_DML_30040  SET C1 = 10 WHERE C1 = 1; </SQL>
+	<SQL> UPDATE T01_DML_30040  SET C1 = 1 WHERE C1 = 10; </SQL>
+	<SQL> UPDATE T01_DML_30040  SET C1 = 10 WHERE C1 = 1; </SQL>	
+	<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL </TYPE><!-- 预期执行成功，并返回一个结果集，验证全字匹配长度 -->
+	<SQL> SELECT * FROM T01_DML_30040; </SQL>
+	<RESULT>
+		<RECORD>
+			<COLUMN>10</COLUMN><COLUMN>1</COLUMN>
+		</RECORD>
+		<RECORD>
+			<COLUMN>2</COLUMN><COLUMN>2</COLUMN>
+		</RECORD>
+		<RECORD>
+			<COLUMN>3</COLUMN><COLUMN>3</COLUMN>
+		</RECORD>
+
+	</RESULT>
+
+	</SQL_CASE>
+	<!-- - - - - - - - - - - - 测试点1：结束 - - - - - - - - - - - -->
+	<CLEAR><!-- 脚本清除模块，该关键字标识清除块开始 -->
+		<SQL_CASE>
+		<SQL> DROP TABLE T01_DML_30040; </SQL>
+			
+		</SQL_CASE>
+	</CLEAR>
+</SQLTEST> 
