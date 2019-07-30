@@ -23,7 +23,7 @@
 <!--    <RANDOM>0</RANDOM>&lt;!&ndash;0:不随机执行，1：随机执行(随机执行自动为无限循环执行)&ndash;&gt;-->
 <!--    <THREADS>1</THREADS>&lt;!&ndash;有多少个线程来并行执行待测试的XML文件&ndash;&gt;-->
 <!--    E:\测试相关\01_dml\01_dml\00_insert\insert_001.xml-->
-    <FILEPATH>E:\测试相关\01_dml\01_dml\00_insert\insert_000.xml </FILEPATH><!--默认测试用例路径，用例路径之间用一个空格区分-->
+    <FILEPATH>..\gdm_xml\01_dml\00_insert\insert_000.xml </FILEPATH><!--默认测试用例路径，用例路径之间用一个空格区分-->
     <LOOP>0</LOOP>
 
     <INFOLEVEL>2</INFOLEVEL><!--0:屏幕只显示文件名，1：显示文件名、错误信息，2：显示文件名、错误信息、所有SQL-->
