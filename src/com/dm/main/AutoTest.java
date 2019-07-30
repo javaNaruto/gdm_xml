@@ -75,7 +75,6 @@ public class AutoTest {
 //						flag = true;
 //						Thread.sleep(4000);
 //					} catch (InterruptedException e1) {
-//						// TODO Auto-generated catch block
 //						e1.printStackTrace();
 //					}
 //				}
@@ -85,7 +84,6 @@ public class AutoTest {
 //								+ ":" + ConfigInfo.getPort() + "/" + ConfigInfo.getDatabase(),
 //								ConfigInfo.getUid(), ConfigInfo.getPwd());
 //					} catch (SQLException e1) {
-//						// TODO Auto-generated catch block
 //						e1.printStackTrace();
 //					}
 //				}
