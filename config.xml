@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="GB2312" ?>
 <TEST>
-    <DRIVER>dm.jdbc.driver.DmDriver</DRIVER>
-    <URL>jdbc:dm://localhost:5236/SYSDBA</URL>
+    <DRIVER>com.mysql.jdbc.Driver</DRIVER>
+    <URL>jdbc:mysql://localhost:3306/ycsb</URL>
     <SERVER>localhost</SERVER><!-- 必须存在，一般默认为localhost-->
     <SERVERPATH>c:\dmdbms</SERVERPATH>
-    <DATABASE>SYSDBA</DATABASE>
-    <SCHEMA>SYSDBA</SCHEMA>
-    <UID>SYSDBA</UID><!--ORACLE改为SYSTEM-->
-    <PWD>SYSDBA</PWD>
-    <PORT>5236</PORT><!--oracle为1521、DM7为5236-->
+    <DATABASE>ycsb</DATABASE>
+    <SCHEMA>root</SCHEMA>
+    <UID>root</UID><!--ORACLE改为SYSTEM-->
+    <PWD>root</PWD>
+    <PORT>3306</PORT><!--oracle为1521、DM7为5236-->
     <RANDOM>0</RANDOM><!--0:不随机执行，1：随机执行(随机执行自动为无限循环执行)-->
     <THREADS>1</THREADS><!--有多少个线程来并行执行待测试的XML文件-->
 <!--    <DRIVER>dm.jdbc.driver.DmDriver</DRIVER>-->
@@ -22,7 +22,8 @@
 <!--    <PORT>5236</PORT>&lt;!&ndash;oracle为1521、DM7为5236&ndash;&gt;-->
 <!--    <RANDOM>0</RANDOM>&lt;!&ndash;0:不随机执行，1：随机执行(随机执行自动为无限循环执行)&ndash;&gt;-->
 <!--    <THREADS>1</THREADS>&lt;!&ndash;有多少个线程来并行执行待测试的XML文件&ndash;&gt;-->
-    <FILEPATH>C:\Performance_00000_dm.xml c:\Performance_00002_dm.xml</FILEPATH><!--默认测试用例路径，用例路径之间用一个空格区分-->
+<!--    E:\测试相关\01_dml\01_dml\00_insert\insert_001.xml-->
+    <FILEPATH>E:\测试相关\01_dml\01_dml\00_insert\insert_000.xml </FILEPATH><!--默认测试用例路径，用例路径之间用一个空格区分-->
     <LOOP>0</LOOP>
 
     <INFOLEVEL>2</INFOLEVEL><!--0:屏幕只显示文件名，1：显示文件名、错误信息，2：显示文件名、错误信息、所有SQL-->

@@ -33,5 +33,7 @@
       </library>
     </orderEntry>
     <orderEntry type="inheritedJdk" />
+    <orderEntry type="library" name="mysql-connector-java-5.1.25" level="project" />
+    <orderEntry type="library" name="gdm-driver-1.0" level="project" />
   </component>
 </module>
