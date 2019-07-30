@@ -19,6 +19,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import com.dm.connect.ConnectionContext;
+import com.gdm.driver.GdmConnection;
+import com.gdm.driver.GdmException;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
@@ -60,7 +63,7 @@ public class XmlExecutor extends Applet implements Runnable {
 	protected static final int LOGIN_SUCCESS = 7;
 	protected static final int LOGIN_FAIL = 8;
 	protected int curType = DIRECT_EXECUTE_SUCCESS;
-	
+
 	/*
 	 * 2010-11-19-YJM
 	 * 对于DISCONNECT节点进行调整，如果text的值为-999999999，则释放所有连接，否则释放最近的SETCONNECTID值的连接
@@ -93,16 +96,16 @@ public class XmlExecutor extends Applet implements Runnable {
 			+ "COLUMN|" + "PARAMETER|" + "CLEARPARAMETERS|" + "OPEN|"
 			+ "FETCHNEXT|" + "TIMETICKS|" + "ENTER|" + "EXIT|"
 			+ "SQLSTR|" + "SQLSTR1|" + "SQLSTR2|" + "LEVEL|"
-			+ "TestPointBegin|" + "RESULTROWS|" 
+			+ "TestPointBegin|" + "RESULTROWS|"
 			+ "TRANS0|" + "TRANS1|"+ "TRANS2|"+ "TRANS3|"+ "TRANS4|"+ "TRANS5|"+ "TRANS6|"+"TRANS7|"
 			+ "CALC_TIMETICKS|" + "TOTALTIME|"+ "MAXTIME|"+ "MINTIME|"+ "AVGTIME|"+"PSQL|";
-	
+
 	/**********************************************************************/
 	/**
 	 * 数据库操作对象
 	 */
 	protected DbOperator dbOperator;
-	protected Connection myConn;
+	protected GdmConnection myConn;
 	protected String curURL;
 	protected String curServer;
 	protected String curPort;
@@ -125,30 +128,30 @@ public class XmlExecutor extends Applet implements Runnable {
 	protected ArrayList<MyConnection> otherConnList;
 	protected int loopCount = 0;				// LOOP循环层数
 	protected int[] times=new int[5];			// 每层LOOP循环最大循环数
-	protected int[] timesIndex = new int[5]; 	// 每层LOOP循环，当前循环次数                            
-	
+	protected int[] timesIndex = new int[5]; 	// 每层LOOP循环，当前循环次数
+
 	// 记录SQL_CASE和SQL节点个数，把错误定位到行
 //	private int sqlCaseNum = 0;
 	public int sqlNum = 0;
 	public boolean isInLoop;
 	public String curRawSql;					// 记录原始的SQL语句来定位错误行，因为有可能是<SQL>@SQLSTR</SQL>
-	
-	protected MyLog mlog = AutoTest.mlog;	
+
+	protected MyLog mlog = AutoTest.mlog;
 	protected ExceptionLog exlog = AutoTest.exlog;
-	
+
 	protected boolean ifIsTrue = true;		// 判断是否执行ELSE
-	
+
 	protected boolean isNewConnectExecute = false;	// 是否是NEWCONNECTEXECUTE节点
 	protected boolean isMoreThread = false;			// 作用同上
 	protected int fetchIndex = -1; 				// 解决FETCHNEXT
 	public String curSql;						// 记录当前SQL语句
 	public boolean caseExpResult;				// 解决关键字CASEEXPRESULT
 	public ArrayList<String> rubbishMap;		// 清空临时放入mapForChange里的key，防止mapForChange很大
-	
+
 	public boolean isBreak = false;				// 处理LOOP中的BREAK
 	//处理事务相关关键字 2010-3-19
 	public int transCount = -1;					// TRANS从0开始
-	public ArrayList<Connection> transConnList; 
+	public ArrayList<GdmConnection> transConnList;
 	public boolean isTrans = false;
 	// 2010-4-7 添加
 	//查看工具是否运行在Linux环境下，Linux环境下路径分隔符为"/"与Window下有些差别
@@ -157,19 +160,19 @@ public class XmlExecutor extends Applet implements Runnable {
 	// 2010-4-22 添加 处理CLEAR的错误
 	public boolean isClear = false;
 	//2011-3-8 修改程序输出，设置检查标记。
-    public  String Test_Point[][]=new String[TEST_POINT_NUM][2]; 
+    public  String Test_Point[][]=new String[TEST_POINT_NUM][2];
 	public  int xx=0;
 	int running;
 	//2011-3-23 修改输出，设SQL_CASE 为一个执行单位点
 	public boolean casesqlcase=true;
 	public boolean isinsqlcase=false;
-	
+
 	//2011-3-18 重写NEWTRANS方法，创建线程数组存放TRANS线程
 	Thread transthread[]=new Thread[TRANS_COUNT];
 	TRANSEXecurtor trans[]=new TRANSEXecurtor[TRANS_COUNT];
 	//2011-3-29 SQL耗费时间
 	private double usedtime=0;
-	
+
      //2011-3-11 新构造方法
 	public XmlExecutor(String curFiString,int running){
 		this.curFilePath = curFiString;
@@ -186,11 +189,11 @@ public class XmlExecutor extends Applet implements Runnable {
 	public boolean ExecuteXml(String xmlFilePath){
 		init();								// 测试工具配置参数初始化
 		if(true == xmlinit()){				// XML解析初始化
-			Connection Conn1;
+			GdmConnection Conn1;
 			try {
-				Conn1 = DriverManager.getConnection(curURL,curUid,curPwd);
+				Conn1 = ConnectionContext.getConnection("usertable");
 				dbOperator = new DbOperator(Conn1);
-			} catch (SQLException e) {
+			} catch (GdmException e) {
 				//Message.msgs.offer(e.getMessage());
 				//Display.getDefault().asyncExec(new Message());
 				System.out.println("初始化申请连接失败--SERVER:"+curServer+"PORT:"+curPort+"DATABASE:"+curDatabase+"UID:"+curUid+"PASSWORD:"+curPwd);
@@ -220,16 +223,16 @@ public class XmlExecutor extends Applet implements Runnable {
 			Test_Point[xx][0]="TESTPOINTBEFORE";
 			Test_Point[xx][1]="True";
 			boolean tempBool = ExecuteElement(root);
-			
+
 			/*
 			 * 2010-11-19-YJM
 			 * 在一个脚本执行完之后，释放链接之前，把所有的SQL语句都提交
 			 */
 			try {
 				dbOperator.setConn(Conn1);
-				dbOperator.DirectExecute("commit");
-				dbOperator.commit();
-			} catch (SQLException e1) {
+//				dbOperator.DirectExecute("commit");
+				dbOperator.openAutoCommit();
+			} catch (GdmException e1) {
 				// TODO Auto-generated catch block
 				//2010-12-22-YJM等待服务器重启
 				boolean flag = false;
@@ -246,9 +249,9 @@ public class XmlExecutor extends Applet implements Runnable {
 					}
 					if(flag) {
 						try {
-							Conn1 = DriverManager.getConnection(curURL,curUid,curPwd);
+							Conn1 = ConnectionContext.getConnection("usertable");
 							dbOperator.setConn(Conn1);
-						} catch (SQLException e) {
+						} catch (GdmException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
@@ -257,7 +260,7 @@ public class XmlExecutor extends Applet implements Runnable {
 				//2010-12-22-YJM等待服务器重启
 				e1.printStackTrace();
 			}
-			
+
 			try {
 				Conn1.close();
 			} catch(Exception e) {
@@ -266,7 +269,7 @@ public class XmlExecutor extends Applet implements Runnable {
 		    /*2011-3-9
 		     * 打印输出日志
 		     * */
-			
+
 			int flag=1;
 			for(int i=0;i<=xx;i++){
 				if(Test_Point[i][1]=="FAULT")
@@ -276,7 +279,7 @@ public class XmlExecutor extends Applet implements Runnable {
 			synchronized(exlog){
 			  if(flag==0){
 				  exlog.error(curFilePath+"   FAULT");
-				  
+
 				  for(int i=0;i<=xx;i++){
 					  if(Test_Point[i][1]=="FAULT")
 					  exlog.error(Test_Point[i][0]+"  FAULT");
@@ -298,11 +301,11 @@ public class XmlExecutor extends Applet implements Runnable {
 			return false;
 		}
 	}
-	
+
 	public void init(){
 		isLinuxOs = System.getProperties().getProperty("os.name").equals("Linux");
 		filePathSepartor = isLinuxOs ? '/' : '\\';
-		transConnList=new ArrayList<Connection>();
+		transConnList=new ArrayList<>();
 		mapForChange = new HashMap<String, String>();
 		otherConnList = new ArrayList<MyConnection>();
 		mapForChange.put("@SERVER", ConfigInfo.getServer());
@@ -321,7 +324,7 @@ public class XmlExecutor extends Applet implements Runnable {
 		mapForChange.put("@PATH",curFilePath.substring(0, curFilePath.lastIndexOf(filePathSepartor)));
 		mapForChange.put("@SERVERPATH", ConfigInfo.getServerPath());
 		loopCount = 0;
-		
+
 		// 使用测试工具设置的连接信息初始化单个测例的连接信息
 		curURL = ConfigInfo.getURL();
 		curDatabase = ConfigInfo.getDatabase();
@@ -330,7 +333,7 @@ public class XmlExecutor extends Applet implements Runnable {
 		curPort = ConfigInfo.getPort();
 		curPwd = ConfigInfo.getPwd();
 		// JDBCURL 变为 jdbc:dm://server:port/DATABASE
-		
+
 		ifIsTrue = true;
 		isNewConnectExecute = false;
 		isMoreThread = false;
@@ -338,16 +341,16 @@ public class XmlExecutor extends Applet implements Runnable {
 		caseExpResult = true;
 		rubbishMap = new ArrayList<String>();
 		isBreak = false;
-		
+
 		sqlNum = 0;
 		isInLoop = false;
 		transCount = -1;
 		myConnMap = new HashMap<Integer, MyConnection>();   //2010-3-22 添加
 		isTrans = false;
 		isClear = false;
-		
+
 	}
-	
+
 	public void connFree(){
 		int i=0;
 		int listLen = otherConnList.size();
@@ -355,7 +358,7 @@ public class XmlExecutor extends Applet implements Runnable {
 		while(myConn!=null){
 			try {
 				myConn.close();
-			} catch (SQLException e) {
+			} catch (GdmException e) {
 				// TODO Auto-generated catch block
 				exlog.error(curFilePath+"释放连接失败");
 				e.printStackTrace();
@@ -363,11 +366,11 @@ public class XmlExecutor extends Applet implements Runnable {
 			i++;
 			myConn = myConnMap.get(i);
 		}
-		
+
 		for(i=0;i<listLen;i++){
 			try {
 				otherConnList.get(i).close();
-			} catch (SQLException e) {
+			} catch (GdmException e) {
 				exlog.error(curFilePath+"释放连接失败(otherConnList)");
               	e.printStackTrace();
 			}
@@ -389,7 +392,7 @@ public class XmlExecutor extends Applet implements Runnable {
 			fr = new FileReader(curFilePath.trim());
 		} catch (FileNotFoundException e) {
 			//mlog.error("fail to open file："+curFilePath);
-			
+
 			exlog.error(curFilePath+"不能打开该文件");
 //			e.printStackTrace();
 			System.out.println("cur file failed 1:"+curFilePath);
@@ -429,8 +432,8 @@ public class XmlExecutor extends Applet implements Runnable {
 		len = transConnList.size();
 		for(i=0;i<len;i++){
 			try {
-				transConnList.get(i).close();
-			} catch (SQLException e) {
+//				transConnList.get(i).close();
+			} catch (GdmException e) {
 //				e.printStackTrace();
 			}
 		}
@@ -460,11 +463,11 @@ public class XmlExecutor extends Applet implements Runnable {
 						if(!elementList.get(i-3).getName().trim().equalsIgnoreCase("UID")) {
 							curUid = ConfigInfo.getUid();
 						}
-						
+
 						if(!elementList.get(i-2).getName().trim().equalsIgnoreCase("PWD")) {
 							curPwd = ConfigInfo.getPwd();
 						}
-						
+
 						if(!elementList.get(i-1).getName().trim().equalsIgnoreCase("DATABASE")) {
 							curDatabase = ConfigInfo.getDatabase();
 						}
@@ -523,7 +526,7 @@ public class XmlExecutor extends Applet implements Runnable {
 //							&& !elementList.get(i + 1).getText().trim().equals("ELSE")) {
 //						i++;
 //					}
-					
+
 //					elementList.get(i).getText().trim() getText-->getName
 					if (curKeyWord.equals("IF") && ifIsTrue == false) {
 						while(i<eListSize&&!(elementList.get(i).getName().trim().equals("ELSE"))){
@@ -549,9 +552,9 @@ public class XmlExecutor extends Applet implements Runnable {
 					return false;
 				}
 				if(obj.equals(false)){
-					
+
 				}
-			} else { 
+			} else {
 				// 该节点关键字不存在，还要判断是否有<EXP>节点
 				String tmpStr = element.getText();
 				Element expElement = element.element("EXP");
@@ -565,12 +568,12 @@ public class XmlExecutor extends Applet implements Runnable {
 		}
 		return true;
 	}
-	
-	
-	
-	
+
+
+
+
 	public class Operator{
-		
+
 		public boolean CONTENT(Element element){
 			System.out.println("\n--用例描述:"+element.getText()+"\r");
 			//Message.msgs.offer("\n--用例描述:"+element.getText()+"\r");
@@ -626,7 +629,7 @@ public class XmlExecutor extends Applet implements Runnable {
 			 */
 			if(isNewConnectExecute==true||isMoreThread==true||isTrans==true) {
 				return true;
-			}	
+			}
 			if(otherConnList.size()==0&&myConnMap.size()==0){
 				return true;
 			}
@@ -639,7 +642,7 @@ public class XmlExecutor extends Applet implements Runnable {
 					for(int i=0;i<mapsize;i++){
 						try {
 							myConnMap.get(i).close();
-						} catch (SQLException e) {
+						} catch (GdmException e) {
 							Test_Point[xx][1]="FAULT";
 							//System.out.println("DISCONNECT所有失败");
 						}
@@ -648,7 +651,7 @@ public class XmlExecutor extends Applet implements Runnable {
 				else{
 					try {
 						myConnMap.get(cId).close();
-						} catch (SQLException e) {
+						} catch (GdmException e) {
 							Test_Point[xx][1]="FAULT";
 							//mlog.error("DISCONNECT失败");
 							return false;
@@ -661,8 +664,8 @@ public class XmlExecutor extends Applet implements Runnable {
 				 */
 				if(curConnId == CURCONNID) {
 					try {
-						dbOperator.close();
-					} catch (SQLException e) {
+//						dbOperator.close();
+					} catch (GdmException e) {
 						Test_Point[xx][1]="FAULT";
 						//mlog.error("DISCONNECT失败");
 						return false;
@@ -677,7 +680,7 @@ public class XmlExecutor extends Applet implements Runnable {
 						if(myConnMap.get(curConnId)!= null) {
 							myConnMap.get(curConnId).close();
 						}
-					} catch (SQLException e) {
+					} catch (GdmException e) {
 						Test_Point[xx][1]="FAULT";
 						//mlog.error("DISCONNECT失败");
 						return false;
@@ -687,15 +690,15 @@ public class XmlExecutor extends Applet implements Runnable {
 			}
 			return true;
 		}
-		
+
 		// <CONNECT></CONNECT>内容为空时，连接信息不放入myConnMap。
 		//但第一个<CONNECT>要当做connectId为0放入myConnMap
 		public boolean newConnect()  {
 			String dbUrl = "jdbc:dm://" + curServer + ":" + curPort + "/"+ curDatabase;
 			try {
-				Connection conn=DriverManager.getConnection(dbUrl,curUid,curPwd);
+				GdmConnection conn = ConnectionContext.getConnection("usertable");
 				//MyConnection newConn = AutoTest.connManager.getConnection(dbUrl, curUid, curPwd);
-				MyConnection newConn=new MyConnection(conn);	
+				MyConnection newConn=new MyConnection(conn);
 				//MyConnectionPool pool=new MyConnectionPool(dbUrl,curUid,curPwd);
 				//MyConnection newConn = new MyConnection(conn,pool);
 				dbOperator.setConn(newConn);
@@ -707,7 +710,7 @@ public class XmlExecutor extends Applet implements Runnable {
 				if(connectId==-1)
 					otherConnList.add(newConn);
 				return true;
-			} catch (SQLException e) {
+			} catch (GdmException e) {
 				Test_Point[xx][1]="FAULT";
 				//mlog.errorConn("新建连接时失败\r\n" + e.getMessage(), curServer,curPort, curDatabase, curUid, curPwd);
 				return false;
@@ -733,16 +736,16 @@ public class XmlExecutor extends Applet implements Runnable {
 				//显示正在执行的线程
 				if(!(running==0))
 				System.out.println("--THIS IS THREADS "+running);
-				
+
 				//Message.msgs.offer("\n--sql no "+sqlNum+" :"+"\r"+ sql);
 				//Display.getDefault().asyncExec(new Message());
 			}
-			
+
 			ExecuteSql(sql);
-			
+
 			return true;
 		}
-		
+
 		public boolean TYPE(Element element){
 			String str = element.getText().trim();
 			curType = getType(str);
@@ -755,7 +758,7 @@ public class XmlExecutor extends Applet implements Runnable {
 			}
 			return true;
 		}
-		
+
 		@SuppressWarnings("unchecked")
 		public boolean RESULT(Element element){
 			String RECORDNUMS = element.elementText("RECORDNUMS");
@@ -832,7 +835,7 @@ public class XmlExecutor extends Applet implements Runnable {
 			}
 			return true;
 		}
-		
+
 		public boolean COMPARE(String columnXml, int x, int y) {
 			String fromServer = "";
 			try {
@@ -850,7 +853,7 @@ public class XmlExecutor extends Applet implements Runnable {
 						//Message.msgs.offer("比较结果不正确\r\n\tXML值："+ columnXml + "实际值："	+ fromServer);
 						//Display.getDefault().asyncExec(new Message());
 						System.out.println("比较结果不正确\r\n\tXML值："+ columnXml + "实际值："	+ fromServer);
-						
+
 						//mlog.error("比较结果不正确\r\n\t"+"当前SQL:"+curRawSql+"\r\n\tXML里：" + columnXml + "实际值："
 						//		+ fromServer);
 						if(!isinsqlcase){
@@ -901,7 +904,7 @@ public class XmlExecutor extends Applet implements Runnable {
 						fromServer = sqlResult.getFullResult().get(x).get(y).trim();
 						if (columnXml.startsWith("0x")|| columnXml.startsWith("0X")) {
 							columnXml = columnXml.substring(2);
-						}	
+						}
 					}
 					if (sqlResult==null||!fromServer.equals(columnXml)) {
 						//Message.msgs.offer("比较结果不正确\r\n\tXML值："+ columnXml + "实际值："	+ fromServer);
@@ -944,7 +947,7 @@ public class XmlExecutor extends Applet implements Runnable {
 			curServer = element.getText().trim();
 			return true;
 		}
-		
+
 		// 如果是NEWCONNECTEXECUTE、MORETHREAD和NEWTRANS节点，不处理
 		public boolean UID(Element element){
 			if(isNewConnectExecute||isMoreThread==true||isTrans==true)
@@ -983,7 +986,7 @@ public class XmlExecutor extends Applet implements Runnable {
 			caseExpResult = true;
 			return tempcase;
 		}
-		
+
 		public boolean EFFECTROWS(Element element){
 			String str = element.getText().trim();
 //			System.out.println(str);	// EFFECTROWS.XML打印信息正确
@@ -1003,18 +1006,18 @@ public class XmlExecutor extends Applet implements Runnable {
 			}
 			return true;
 		}
-		public boolean ExecuteSql(String sql){
+		public boolean ExecuteSql(String gql){
 			// 此时TYPE不会出现其他的值
 			switch(curType){
 			case DIRECT_EXECUTE_SUCCESS:
 				try {
-						effectRows = dbOperator.DirectExecute(sql);
-					} catch (SQLException e) {
+						effectRows = dbOperator.DirectExecute(gql);
+					} catch (GdmException e) {
 						//2010-12-22-YJM等待服务器重启
 						boolean flag = false;
 						if(e.getMessage().equals("网络通信异常")) {
 							//exlog.errorWithTime("\r\n--********************\r\n--执行测试用例："+curFilePath);
-							System.out.println(sql+"网络通信异常");
+							System.out.println(gql+"网络通信异常");
 							Test_Point[xx][1]="FAULT";
 							while(!InetOperator.isObjectAlive(ConfigInfo.getServer(), ConfigInfo.getPort())) {
 								InetOperator.isObjectAlive(ConfigInfo.getServer(), ConfigInfo.getDmServerPluginStartPort());
@@ -1028,9 +1031,9 @@ public class XmlExecutor extends Applet implements Runnable {
 							}
 							if(flag) {
 								try {
-									myConn = DriverManager.getConnection(curURL,curUid,curPwd);
+									myConn = ConnectionContext.getConnection("usertable");
 									dbOperator.setConn(myConn);
-								} catch (SQLException e1) {
+								} catch (GdmException e1) {
 									// TODO Auto-generated catch block
 									e1.printStackTrace();
 								}
@@ -1088,7 +1091,7 @@ public class XmlExecutor extends Applet implements Runnable {
 				break;
 			case DIRECT_EXECUTE_FAIL:
 				try {
-						dbOperator.DirectExecute(sql);
+						dbOperator.DirectExecute(gql);
 						/*
 						 * YJM-2010-10-27
 						 * 调换config.getInfolevel()和"0","1","2"的位置，防止空指针异常
@@ -1107,7 +1110,7 @@ public class XmlExecutor extends Applet implements Runnable {
 						{
 							//Message.msgs.offer("执行SQL语句失败（预期执行失败，实际执行成功）：\r\n\t"+sql+"\r\n\t");
 							//Display.getDefault().asyncExec(new Message());
-							System.out.println("执行SQL语句失败（预期执行失败，实际执行成功）：\r\n\t"+sql+"\r\n\t");
+							System.out.println("执行SQL语句失败（预期执行失败，实际执行成功）：\r\n\t"+gql+"\r\n\t");
 							if(!isinsqlcase){
 								Test_Point[xx][1]="FAULT";
 							   }else{
@@ -1134,12 +1137,12 @@ public class XmlExecutor extends Applet implements Runnable {
 							//mlog.error("执行SQL语句失败（预期执行失败，实际执行成功）：\r\n\t"+sql+"\r\n\t");
 						}
 						return false;
-					} catch (SQLException e) {
+					} catch (GdmException e) {
 //						//2010-12-22-YJM等待服务器重启
 						boolean flag = false;
 						if(e.getMessage().equals("网络通信异常")) {
 							//exlog.errorWithTime("\r\n--********************\r\n--执行测试用例："+curFilePath);
-							System.out.println(sql+"网络通信异常");
+							System.out.println(gql+"网络通信异常");
 							Test_Point[xx][1]="FAULT";
 							while(!InetOperator.isObjectAlive(ConfigInfo.getServer(), ConfigInfo.getPort())) {
 								InetOperator.isObjectAlive(ConfigInfo.getServer(), ConfigInfo.getDmServerPluginStartPort());
@@ -1153,9 +1156,9 @@ public class XmlExecutor extends Applet implements Runnable {
 							}
 							if(flag) {
 								try {
-									myConn = DriverManager.getConnection(curURL,curUid,curPwd);
+									myConn = ConnectionContext.getConnection("usertable");
 									dbOperator.setConn(myConn);
-								} catch (SQLException e1) {
+								} catch (GdmException e1) {
 									// TODO Auto-generated catch block
 									e1.printStackTrace();
 								}
@@ -1167,13 +1170,13 @@ public class XmlExecutor extends Applet implements Runnable {
 				break;
 			case DIRECT_EXECUTE_IGNORE:
 				try {
-						dbOperator.DirectExecute(sql);
-					} catch (SQLException e) {
+						dbOperator.DirectExecute(gql);
+					} catch (GdmException e) {
 //						//2010-12-22-YJM等待服务器重启
 						boolean flag = false;
 						if(e.getMessage().equals("网络通信异常")) {
 							//exlog.errorWithTime("\r\n--********************\r\n--执行测试用例："+curFilePath);
-							System.out.println(sql+"网络通信异常");
+							System.out.println(gql+"网络通信异常");
 							Test_Point[xx][1]="FAULT";
 							while(!InetOperator.isObjectAlive(ConfigInfo.getServer(), ConfigInfo.getPort())) {
 								InetOperator.isObjectAlive(ConfigInfo.getServer(), ConfigInfo.getDmServerPluginStartPort());
@@ -1187,9 +1190,9 @@ public class XmlExecutor extends Applet implements Runnable {
 							}
 							if(flag) {
 								try {
-									myConn = DriverManager.getConnection(curURL,curUid,curPwd);
+									myConn = ConnectionContext.getConnection("usertable");
 									dbOperator.setConn(myConn);
-								} catch (SQLException e1) {
+								} catch (GdmException e1) {
 									// TODO Auto-generated catch block
 									e1.printStackTrace();
 								}
@@ -1204,8 +1207,8 @@ public class XmlExecutor extends Applet implements Runnable {
 //			case DIRECT_EXECUTE_SELECT_WITH_RESULT:
 			default: try {
 						sqlResult = null;
-						sqlResult = dbOperator.ExecuteQuery(sql);
-					} catch (SQLException e) {
+//						sqlResult = dbOperator.ExecuteQuery(sql);
+					} catch (GdmException e) {
 						//2010-12-22-YJM等待服务器重启
 						boolean flag = false;
 						if(e.getMessage().equals("网络通信异常")) {
@@ -1224,9 +1227,9 @@ public class XmlExecutor extends Applet implements Runnable {
 							}
 							if(flag) {
 								try {
-									myConn = DriverManager.getConnection(curURL,curUid,curPwd);
+									myConn = ConnectionContext.getConnection("usertable");
 									dbOperator = new DbOperator(myConn);
-								} catch (SQLException e1) {
+								} catch (GdmException e1) {
 									// TODO Auto-generated catch block
 									e1.printStackTrace();
 								}
@@ -1251,7 +1254,7 @@ public class XmlExecutor extends Applet implements Runnable {
 						{
 							//Message.msgs.offer("执行SQL语句失败：\r\n\t"+sql+"\r\n\t"+e.getMessage());
 							//Display.getDefault().asyncExec(new Message());
-							System.out.println("执行SQL语句失败：\r\n\t"+sql+"\r\n\t"+e.getMessage());
+							System.out.println("执行SQL语句失败：\r\n\t"+gql+"\r\n\t"+e.getMessage());
 							if(!isinsqlcase){
 								Test_Point[xx][1]="FAULT";
 							   }else{
@@ -1288,7 +1291,7 @@ public class XmlExecutor extends Applet implements Runnable {
 			// 2010-4-22 添加 CLEAR 中忽略错误
 			isClear = true;
 			curType = DIRECT_EXECUTE_IGNORE;
-		
+
 			try {
 				Thread.sleep(3000);
 			} catch (InterruptedException e) {
@@ -1300,7 +1303,7 @@ public class XmlExecutor extends Applet implements Runnable {
 			ExecuteElement(element);
 			return true;
 		}
-		
+
 		public boolean GETDMINI(Element element){
 			String iniPath = element.elementText("INIPATH").trim();
 			iniPath = replaceStr(iniPath);
@@ -1320,10 +1323,10 @@ public class XmlExecutor extends Applet implements Runnable {
 //				e.printStackTrace();
 			}
 			String val = element.elementText("VAL").trim();
-			mapForChange.put(val, value);			
+			mapForChange.put(val, value);
 			return true;
 		}
-		
+
 		// 不支持多重<IF><ELSE>嵌套
 		public boolean IF(Element element){
 			String str = element.getText().trim();
@@ -1335,7 +1338,7 @@ public class XmlExecutor extends Applet implements Runnable {
 				try {
 					ifIsTrue = dbOperator.DirectExecute(sql) == 1 ? true
 							: false;
-				} catch (SQLException e) {
+				} catch (GdmException e) {
 					Test_Point[xx][1]="FAULT";
 					//mlog.error("IF节点表达式求值错误："+str);
 //					e.printStackTrace();
@@ -1345,7 +1348,7 @@ public class XmlExecutor extends Applet implements Runnable {
 				str = replaceStr(str);
 				try {
 					ifIsTrue = dbOperator.DirectExecute(str)==1?true:false;
-				} catch (SQLException e) {
+				} catch (GdmException e) {
 					// 执行错误认为IF条件为假
 					ifIsTrue = false;
 					Test_Point[xx][1]="FAULT";
@@ -1358,7 +1361,7 @@ public class XmlExecutor extends Applet implements Runnable {
 				try {
 					ifIsTrue = dbOperator.DirectExecute(sql) == 1 ? true
 							: false;
-				} catch (SQLException e) {
+				} catch (GdmException e) {
 					Test_Point[xx][1]="FAULT";
 					//mlog.error("IF节点表达式求值错误："+str);
 //					e.printStackTrace();
@@ -1366,7 +1369,7 @@ public class XmlExecutor extends Applet implements Runnable {
 			}
 			return true;
 		}
-		
+
 		public boolean ELSE(Element element){
 			if(false == ifIsTrue){
 				ExecuteElement(element);
@@ -1390,8 +1393,8 @@ public class XmlExecutor extends Applet implements Runnable {
 			if(str.startsWith("FromSql:")){
 				str = str.substring("FromSql:".length());
 				try {
-					str = dbOperator.getExp(str);
-				} catch (SQLException e) {
+//					str = dbOperator.getExp(str);
+				} catch (GdmException e) {
 //					e.printStackTrace();
 				}
 				if (str == null || str.equals("")) {
@@ -1432,8 +1435,8 @@ public class XmlExecutor extends Applet implements Runnable {
 			if(str.startsWith("FromSql:")){
 				str = str.substring("FromSql:".length());
 				try {
-					str = dbOperator.getExp(str);
-				} catch (SQLException e) {
+//					str = dbOperator.getExp(str);
+				} catch (GdmException e) {
 //					e.printStackTrace();
 				}
 				if (str == null || str.equals("")) {
@@ -1441,7 +1444,7 @@ public class XmlExecutor extends Applet implements Runnable {
 				} else {
 					mapForChange.put("@SQLSTR",str);
 				}
-				
+
 			}
 			return true;
 		}
@@ -1474,8 +1477,8 @@ public class XmlExecutor extends Applet implements Runnable {
 			if(str.startsWith("FromSql:")){
 				str = str.substring("FromSql:".length());
 				try {
-					str = dbOperator.getExp(str);
-				} catch (SQLException e) {
+//					str = dbOperator.getExp(str);
+				} catch (GdmException e) {
 //					e.printStackTrace();
 				}
 				if (str == null || str.equals("")) {
@@ -1483,7 +1486,7 @@ public class XmlExecutor extends Applet implements Runnable {
 				} else {
 					mapForChange.put("@SQLSTR1",str);
 				}
-				
+
 			}
 			return true;
 		}
@@ -1516,8 +1519,8 @@ public class XmlExecutor extends Applet implements Runnable {
 			if(str.startsWith("FromSql:")){
 				str = str.substring("FromSql:".length());
 				try {
-					str = dbOperator.getExp(str);
-				} catch (SQLException e) {
+//					str = dbOperator.getExp(str);
+				} catch (GdmException e) {
 //					e.printStackTrace();
 				}
 				if (str == null || str.equals("")) {
@@ -1525,11 +1528,11 @@ public class XmlExecutor extends Applet implements Runnable {
 				} else {
 					mapForChange.put("@SQLSTR2",str);
 				}
-				
+
 			}
 			return true;
 		}
-		
+
 		public boolean EXEXML(Element element){
 			String str = element.getText().trim();
 			String temp = curFilePath.substring(0, curFilePath.lastIndexOf(filePathSepartor));
@@ -1547,7 +1550,7 @@ public class XmlExecutor extends Applet implements Runnable {
 			txtExecuter.ExecuteXml(str);
 			return true;
 		}
-		
+
 		public boolean EXEPROCESS(Element element){
 			String str = element.getText().trim();
 			String temp = curFilePath.substring(0, curFilePath.lastIndexOf(filePathSepartor));
@@ -1567,7 +1570,7 @@ public class XmlExecutor extends Applet implements Runnable {
 			command[3] = "";
 			command[4] = "";
 			command[5] = "";
-			
+
 			try {
 				proc = runtime.exec(command);
 				StreamGobbler errorGobbler = new StreamGobbler(proc.getErrorStream());
@@ -1587,7 +1590,7 @@ public class XmlExecutor extends Applet implements Runnable {
 			}
 			return true;
 		}
-		
+
 		/*
 		* 2010-11-16-YJM
 		* 解决问题：函数不存在，函数名：EXEPROCESSEX
@@ -1613,7 +1616,7 @@ public class XmlExecutor extends Applet implements Runnable {
 			command[3] = "";
 			command[4] = "";
 			command[5] = "";
-			
+
 			try {
 				proc = runtime.exec(command);
 				StreamGobbler errorGobbler = new StreamGobbler(proc.getErrorStream());
@@ -1633,11 +1636,11 @@ public class XmlExecutor extends Applet implements Runnable {
 			}
 			return true;
 		}
-		
+
 		public boolean IGNORE(Element element){
 			return true;
 		}
-		
+
 		public boolean LOOP(Element element) {
 			isInLoop = true;
 			loopCount++;
@@ -1674,7 +1677,7 @@ public class XmlExecutor extends Applet implements Runnable {
 					mapForChange.put("@" + loopCount + "TIMES", String.valueOf(timesIndex[loopCount]));
 					// 2010-3-23 注释掉
 					// 为了E:\testroot\dmserver1\for_xml\00-security\1-SACL\TP\TP_F_01.XML
-//					curType = DIRECT_EXECUTE_SUCCESS;			
+//					curType = DIRECT_EXECUTE_SUCCESS;
 					ExecuteElement(element);
 					if(isBreak==true){
 						isBreak = false;
@@ -1700,20 +1703,20 @@ public class XmlExecutor extends Applet implements Runnable {
 			isInLoop = false;
 			return true;
 		}
-		
+
 		public int EXP(Element element){
 			String expStr = element.getText().trim();
 			expStr = replaceStr(expStr);
 			String temp;
 			int tempInt = 0;
 			try {
-				temp = dbOperator.getExp("SELECT "+expStr);
-				int tempDot = temp.indexOf('.');
-				if(tempDot!=-1){
-					temp = temp.substring(0,tempDot);
-				}
-				tempInt = Integer.valueOf(temp);
-			} catch (SQLException e) {
+//				temp = dbOperator.getExp("SELECT "+expStr);
+//				int tempDot = temp.indexOf('.');
+//				if(tempDot!=-1){
+//					temp = temp.substring(0,tempDot);
+//				}
+//				tempInt = Integer.valueOf(temp);
+			} catch (GdmException e) {
 				Test_Point[xx][1]="FAULT";
 				//mlog.error("EXP计算错误");
 				return -1;
@@ -1725,17 +1728,17 @@ public class XmlExecutor extends Applet implements Runnable {
 			}
 			return tempInt;
 		}
-		
+
 		// 在LOOP内部处理了
 		public boolean TIMES(Element element){
 			return true;
 		}
-		
+
 		public boolean MORETHREAD(Element element){
 			isMoreThread = true;
 			String THREADS = element.elementText("THREADS");
 			String TIMES = element.elementText("TIMES");
-			Connection oldConn = dbOperator.getConn();
+			GdmConnection oldConn = dbOperator.getConn();
 			if(THREADS==null){
 				/*
 				 * 2010-11-19-YJM
@@ -1748,7 +1751,7 @@ public class XmlExecutor extends Applet implements Runnable {
 				} else {
 					curType = getType(str.trim());
 				}
-				
+
 				String strUid = element.elementText("UID");
 				/*
 				 * 2010-11-18-YJM
@@ -1760,7 +1763,7 @@ public class XmlExecutor extends Applet implements Runnable {
 				strUid = strUid.trim();
 				//2010-12-23-YJM重启服务器后用户名和密码的重置
 				curUid = strUid;
-				
+
 				String strPwd = element.elementText("PWD");
 				if(strPwd == null) {
 					strPwd = ConfigInfo.getPwd();
@@ -1772,7 +1775,7 @@ public class XmlExecutor extends Applet implements Runnable {
 				strPwd = strPwd.trim();
 				//2010-12-23-YJM重启服务器后用户名和密码的重置
 				curPwd = strPwd;
-				
+
 				String strDb = element.elementText("DATABASE");
 				if(strDb == null) {
 					strDb = ConfigInfo.getDatabase();
@@ -1798,21 +1801,19 @@ public class XmlExecutor extends Applet implements Runnable {
 					 */
 					curConnId = Integer.valueOf(curId.trim());
 				}
-				
+
 				strUid = replaceStr(strUid);
 				strPwd = replaceStr(strPwd);
 				strDb = replaceStr(strDb);					// 2010-3-24添加 有@DATABASE
-				
+
 				MyConnection newConn = null;
-				
+
 				/*
 				 * 2010-11-19-YJM
 				 * 考虑MORETHREAD节点里有CONNECT，且CONNECT节点里有值的情况
 				 */
 				try {
-					newConn = AutoTest.connManager.getConnection("jdbc:dm://"
-							+ curServer + ":" + curPort + "/" + strDb,
-							strUid, strPwd);
+					newConn = AutoTest.connManager.getConnection("usertable");
 					dbOperator.setConn(newConn);
 					if(curId != null && !(curId.equals(""))) {
 						if(0==myConnMapSize){							// 还没有任何连接信息，默认用工具设置的连接信息
@@ -1821,7 +1822,7 @@ public class XmlExecutor extends Applet implements Runnable {
 						if(connectId!=-1)
 							myConnMap.put(connectId, newConn);
 					}
-				} catch (SQLException e) {
+				} catch (GdmException e) {
 					/*
 					 * 2010-11-19-YJM
 					 * 处理TYPE为LOGIN_FAIL的情况
@@ -1846,9 +1847,9 @@ public class XmlExecutor extends Applet implements Runnable {
 					}
 					// e.printStackTrace();
 				}
-				
+
 				boolean b = ExecuteElement(element);
-				
+
 				try {
 					/*
 					 * 2010-11-18-YJM
@@ -1858,7 +1859,7 @@ public class XmlExecutor extends Applet implements Runnable {
 						newConn.close();
 					}
 					dbOperator.setConn(oldConn);
-				} catch (SQLException e) {
+				} catch (GdmException e) {
 //						e.printStackTrace();
 				}
 				isMoreThread = false;
@@ -1890,7 +1891,7 @@ public class XmlExecutor extends Applet implements Runnable {
 				this.times = times;
 				this.element = element;
 			}
-			
+
 			public void run() {
 				for(i=0;i<times;i++){
 					XmlExecutor xmlExecutor = new XmlExecutor(curFilePath);
@@ -1899,11 +1900,11 @@ public class XmlExecutor extends Applet implements Runnable {
 				}
 			}
 		}
-		
+
 		public boolean STARTTIMES(Element element){
 			return true;
 		}
-		
+
 		//2011-3-25 NEWCONNECTEXECUTE重写连接和释放方法
 		public boolean NEWCONNECTEXECUTE(Element element){
 			String str = element.elementText("TYPE");
@@ -1913,8 +1914,8 @@ public class XmlExecutor extends Applet implements Runnable {
 			} else {
 				curType = getType(str.trim());
 			}
-			
-			Connection oldConn = dbOperator.getConn();
+
+			GdmConnection oldConn = dbOperator.getConn();
 			isNewConnectExecute = true;
 			// 2010-3-19 添加trim()
 			String tempUid = element.elementText("UID");
@@ -1955,16 +1956,15 @@ public class XmlExecutor extends Applet implements Runnable {
 			tempUid = replaceStr(tempUid);
 			tempPwd = replaceStr(tempPwd);
 			tempDatabase = replaceStr(tempDatabase);
-			
+
 			MyConnection newConn=null;
-		
+
 			/*
 			 * 2010-11-19-YJM
 			 * 考虑MORETHREAD节点里有CONNECT，且CONNECT节点里有值的情况
 			 */
 			try {
-				Connection Conn = AutoTest.connManager.getConnection("jdbc:dm://"
-						+ curServer + ":" + curPort + "/" + tempDatabase,tempUid, tempPwd);
+				GdmConnection Conn = AutoTest.connManager.getConnection("usertable");
 				newConn=new MyConnection(Conn);
 				dbOperator.setConn(newConn);
 				if(curId != null && !(curId.equals(""))) {
@@ -1974,10 +1974,10 @@ public class XmlExecutor extends Applet implements Runnable {
 					if(connectId!=-1)
 						myConnMap.put(connectId, newConn);
 				}
-				
+
 				ExecuteElement(element);
-				
-				} catch (SQLException e) {
+
+				} catch (GdmException e) {
 					/*
 					 * 2010-11-19-YJM
 					 * 处理TYPE为LOGIN_FAIL的情况
@@ -2006,25 +2006,25 @@ public class XmlExecutor extends Applet implements Runnable {
 				if(null != newConn) {
 					newConn.close();
 				}
-			} catch (SQLException e) {
+			} catch (GdmException e) {
 				e.printStackTrace();
 			}
 			//2011-3-25 BUG修改：避免释放资源缓慢，造成数据库对象被占用
 			try {
 				Thread.currentThread().sleep(100);
 			} catch (InterruptedException e) {
-				
+
 			}
 			dbOperator.setConn(oldConn);
 			isNewConnectExecute = false;
 			return true;
 		}
-		
+
 		public boolean OPEN(Element element){
 			try {
 				// 再执行一遍刚才的SQL语句 记录结果集
-				sqlResult = dbOperator.ExecuteQuery(curSql);
-			} catch (SQLException e) {
+//				sqlResult = dbOperator.ExecuteQuery(curSql);
+			} catch (GdmException e) {
 //				e.printStackTrace();
 			}
 				ExecuteElement(element);
@@ -2045,7 +2045,7 @@ public class XmlExecutor extends Applet implements Runnable {
 			fetchIndex = -1;
 			return true;
 		}
-		
+
 		public boolean FETCHNEXT(Element element){
 			fetchIndex++;
 			mapForChange.put("@FETCHNEXT", String.valueOf(fetchIndex+1));
@@ -2064,8 +2064,8 @@ public class XmlExecutor extends Applet implements Runnable {
 					mapForChange.put("@FETCHNEXT", "0");
 					return true;
 				}
-				
-				
+
+
 				int i;
 				int columnLen = columnList.size();
 				for(i=0;i<columnLen;i++){
@@ -2074,29 +2074,29 @@ public class XmlExecutor extends Applet implements Runnable {
 			}
 			return true;
 		}
-		
+
 		public boolean FMES(Element element){
 			//String str = element.getText();
 			//2011-3-11FMES暂时被屏蔽
 			//mlog.error(str);
 			return true;
 		}
-		
+
 		public boolean TOGETHER(Element element){
 			return true;
 		}
-		
+
 		public boolean NOSHOW(Element element){
 			return true;
 		}
-		
+
 		public boolean SETCONNECTID(Element element){
 			curConnId = Integer.valueOf(element.getText().trim());
 			myConn = myConnMap.get(curConnId);
 			dbOperator.setConn(myConn);
 			return true;
 		}
-		
+
 		public boolean RECONNECT(Element element){
 			return true;
 		}
@@ -2112,21 +2112,21 @@ public class XmlExecutor extends Applet implements Runnable {
 				}
 			return true;
 		}
-		
+
 		public boolean SQLSTATE(Element element){
 			return true;
 		}
 		public boolean NERROR(Element element){
 			return true;
 		}
-		
+
 		public boolean SMES(Element element){
 			String str = element.getText();
 			str = replaceStr(str);
 			System.out.println(str);
 			return true;
 		}
-		
+
 		// Date.getTime() 得到的是13位的一个数，为与原XML工具兼容这里添4个0，得到秒的话除以10^7
 		public boolean TIMETICKS(Element element){
 			String str = element.getText().trim();
@@ -2140,9 +2140,9 @@ public class XmlExecutor extends Applet implements Runnable {
 		public boolean BEGINTRANS(Element element){
 			try {
 				dbOperator.closeAutoCommit();
-				dbOperator.DirectExecute("commit");
-				//dbOperator.openAutoCommit();
-			} catch (SQLException e) {
+//				dbOperator.DirectExecute("commit");
+				dbOperator.openAutoCommit();
+			} catch (GdmException e) {
 				//mlog.error("设定非自动提交属性失败");
 				System.out.println("设定非自动提交属性失败");
 				Test_Point[xx][1]="FAULT";
@@ -2155,7 +2155,7 @@ public class XmlExecutor extends Applet implements Runnable {
 			}else if(str.toLowerCase().equals("readcommitted")){
 				try {
 					dbOperator.DirectExecute("SET TRANSACTION ISOLATION LEVEL READ COMMITTED");
-				} catch (SQLException e) {
+				} catch (GdmException e) {
 					System.out.println("设定事务隔离级读提交失败");
 					Test_Point[xx][1]="FAULT";
 					//e.printStackTrace();
@@ -2163,7 +2163,7 @@ public class XmlExecutor extends Applet implements Runnable {
 			}else if(str.toLowerCase().equals("readuncommitted")){
 				try {
 					dbOperator.DirectExecute("SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED");
-				} catch (SQLException e) {
+				} catch (GdmException e) {
 					System.out.println("设定事务隔离级脏读失败");
 					Test_Point[xx][1]="FAULT";
 					//e.printStackTrace();
@@ -2171,7 +2171,7 @@ public class XmlExecutor extends Applet implements Runnable {
 			}else if(str.toLowerCase().equals("serializable")){
 				try {
 					dbOperator.DirectExecute("SET TRANSACTION ISOLATION LEVEL SERIALIZABLE");
-				} catch (SQLException e) {
+				} catch (GdmException e) {
 					System.out.println("设定事务隔离级可串行化失败");
 					Test_Point[xx][1]="FAULT";
 					//e.printStackTrace();
@@ -2179,7 +2179,7 @@ public class XmlExecutor extends Applet implements Runnable {
 			}else if(str.toLowerCase().equals("repeatableread")){
 				try {
 					dbOperator.DirectExecute("SET TRANSACTION ISOLATION LEVEL REPEATABLE READ");
-				} catch (SQLException e) {
+				} catch (GdmException e) {
 					System.out.println("设定事务隔离级可重复读失败");
 					Test_Point[xx][1]="FAULT";
 					//e.printStackTrace();
@@ -2188,10 +2188,10 @@ public class XmlExecutor extends Applet implements Runnable {
 				System.out.println("非法关键字");
 				Test_Point[xx][1]="FAULT";
 			}
-			
+
 			return true;
 		}
-		
+
 		public boolean ENDTRANS(Element element){
 			String str = element.getText().trim();
 			try {
@@ -2210,33 +2210,33 @@ public class XmlExecutor extends Applet implements Runnable {
 					//mlog.error("ENDTRANS节点关键字错误：" + str);
 					return false;
 				}
-			} catch (SQLException e) {
+			} catch (GdmException e) {
 				Test_Point[xx][1]="FAULT";
 				System.out.println(str+"错误");
 				//mlog.error(str+"错误");
 				return false;
 			}
-			
+
 			try {
 				dbOperator.openAutoCommit();
-			} catch (SQLException e) {
+			} catch (GdmException e) {
 				Test_Point[xx][1]="FAULT";
 				//mlog.error("关闭自动提交属性失败");
 //				e.printStackTrace();
 			}
 			return true;
 		}
-		
+
 		public boolean LEVEL(Element element){
 			return true;
 		}
-		
+
 		// TYPE: "IN", "OUT", "IN OUT", "RETURN TYPE"
 		public boolean PARAMETER(Element element){
-			
+
 			return true;
 		}
-		
+
 		public boolean delFile(File f) {
   		 	if(f.isDirectory()) {
   		 		for(File ft : f.listFiles())
@@ -2244,7 +2244,7 @@ public class XmlExecutor extends Applet implements Runnable {
   		 	}
   		 	return f.delete();
 		}
-		
+
 		public boolean DELFILE(Element element){
 			String str = element.getText().trim();
 			str = replaceStr(str);
@@ -2266,7 +2266,7 @@ public class XmlExecutor extends Applet implements Runnable {
 			}
 			return true;
 		}
-		
+
 		public boolean CREATEFILE(Element element){
 			String fileName = element.elementText("FILENAME").trim();
 			fileName = replaceStr(fileName);
@@ -2288,7 +2288,7 @@ public class XmlExecutor extends Applet implements Runnable {
 					fw.write(val);
 					fw.close();
 				}
-				
+
 			} catch (IOException e) {
 				Test_Point[xx][1]="FAULT";
 				//mlog.error("创建文件失败："+e.getMessage());
@@ -2310,7 +2310,7 @@ public class XmlExecutor extends Applet implements Runnable {
 
 				while((count = oldfi.read(buffer))!=-1){
 					newfi.write(buffer,0,count);
-//					
+//
 				}
 				oldfi.close();
 				newfi.close();
@@ -2321,7 +2321,7 @@ public class XmlExecutor extends Applet implements Runnable {
 			} catch (IOException e) {
 //				e.printStackTrace();
 			}
-			
+
 			return true;
 		}
 		public boolean TestPointBegin(Element element){
@@ -2332,8 +2332,8 @@ public class XmlExecutor extends Applet implements Runnable {
 			System.out.println(element.getText().trim());
 			return true;
 		}
-		
-		/* 
+
+		/*
 		 * YJM-2010-10-27
 		 * 针对log文件里有这样的报错：TESTPOINTBEGIN-->在XmlExecutor.java里添加函数TESTPOINTBEGIN
 		 */
@@ -2342,7 +2342,7 @@ public class XmlExecutor extends Applet implements Runnable {
 			xx++;
 			Test_Point[xx][0]=element.getText();
 			Test_Point[xx][1]="True";
-			
+
 			return true;
 		}
 		//YJM-2010-10-27
@@ -2360,7 +2360,7 @@ public class XmlExecutor extends Applet implements Runnable {
 					//mlog.error("结果集比较错误XML："+str+"实际："+count);
 					return false;
 				}
-			} catch (SQLException e) {
+			} catch (GdmException e) {
 				//2010-12-22-YJM等待服务器重启
 				boolean flag = false;
 				if(e.getMessage().equals("网络通信异常")) {
@@ -2379,9 +2379,9 @@ public class XmlExecutor extends Applet implements Runnable {
 					}
 					if(flag) {
 						try {
-							myConn = DriverManager.getConnection(curURL,curUid,curPwd);
+							myConn = ConnectionContext.getConnection("usertable");
 							dbOperator = new DbOperator(myConn);
-						} catch (SQLException e1) {
+						} catch (GdmException e1) {
 							// TODO Auto-generated catch block
 							e1.printStackTrace();
 						}
@@ -2392,7 +2392,7 @@ public class XmlExecutor extends Applet implements Runnable {
 			}
 			return true;
 		}
-		
+
 		//2010-3-19添加
 		// element 为空
 		public boolean NEWTRANS(Element element){
@@ -2402,15 +2402,17 @@ public class XmlExecutor extends Applet implements Runnable {
 				System.out.println(transCount+"NEWTRANS过多");
 				return true;
 				}
-			
+
 			try {
-				Connection conn = DriverManager.getConnection("jdbc:dm://" + curServer + ":" + curPort + "/"
-								+ curDatabase, curUid, curPwd);
+//				Connection conn = DriverManager.getConnection("jdbc:dm://" + curServer + ":" + curPort + "/"
+//								+ curDatabase, curUid, curPwd);
+				GdmConnection conn = ConnectionContext.getConnection("usertable");
+
 				transConnList.add(conn);
 				DbOperator dbOperator = new DbOperator(conn);
 				trans[transCount]=new TRANSEXecurtor(dbOperator,true);
 				transthread[transCount]=new Thread(trans[transCount]);
-			} catch (SQLException e) {
+			} catch (GdmException e) {
 				Test_Point[xx][1]="FAULT";
 				System.out.println("NEWTRANS中申请连接失败");
 				//mlog.error("NEWTRANS中申请连接失败");
@@ -2421,7 +2423,7 @@ public class XmlExecutor extends Applet implements Runnable {
 			try {
 				Thread.currentThread().sleep(2000);
 			} catch (InterruptedException e1) {
-				
+
 				e1.printStackTrace();
 			}
 			return true;
@@ -2433,12 +2435,11 @@ public class XmlExecutor extends Applet implements Runnable {
 				String strPwd = element.elementText("PWD").trim();
 				String strDb = element.elementText("DATABASE").trim();
 				try {
-					Connection conn = DriverManager.getConnection("jdbc:dm://" + curServer + ":" + curPort + "/"
-							+ strDb, strUid, strPwd);
+					GdmConnection conn = ConnectionContext.getConnection("usertable");
 					transConnList.add(conn);
 					DbOperator dbOperator = new DbOperator(conn);
 					trans[0].setDbOperator(dbOperator);
-				} catch (SQLException e) {
+				} catch (GdmException e) {
 					Test_Point[xx][1]="FAULT";
 				}
 			}
@@ -2449,10 +2450,10 @@ public class XmlExecutor extends Applet implements Runnable {
 			   try {
 					Thread.currentThread().sleep(3000);
 				} catch (InterruptedException e1) {
-					
+
 					e1.printStackTrace();
 				}
-			
+
 			if(!trans[0].getreault())
 				Test_Point[xx][1]="FAULT";
 			return true;
@@ -2464,12 +2465,11 @@ public class XmlExecutor extends Applet implements Runnable {
 				String strPwd = element.elementText("PWD").trim();
 				String strDb = element.elementText("DATABASE").trim();
 				try {
-					Connection conn = DriverManager.getConnection("jdbc:dm://" + curServer + ":" + curPort + "/"
-							+ strDb, strUid, strPwd);
+					GdmConnection conn = ConnectionContext.getConnection("usertable");
 					transConnList.add(conn);
 					DbOperator dbOperator = new DbOperator(conn);
 					trans[1].setDbOperator(dbOperator);
-				} catch (SQLException e) {
+				} catch (GdmException e) {
 					Test_Point[xx][1]="FAULT";
 				}
 			}
@@ -2480,7 +2480,7 @@ public class XmlExecutor extends Applet implements Runnable {
 			   try {
 					Thread.currentThread().sleep(3000);
 				} catch (InterruptedException e1) {
-					
+
 					e1.printStackTrace();
 				}
 			   /*
@@ -2503,12 +2503,11 @@ public class XmlExecutor extends Applet implements Runnable {
 				String strPwd = element.elementText("PWD").trim();
 				String strDb = element.elementText("DATABASE").trim();
 				try {
-					Connection conn = DriverManager.getConnection("jdbc:dm://" + curServer + ":" + curPort + "/"
-							+ strDb, strUid, strPwd);
+					GdmConnection conn = ConnectionContext.getConnection("usertable");
 					transConnList.add(conn);
 					DbOperator dbOperator = new DbOperator(conn);
 					trans[2].setDbOperator(dbOperator);
-				} catch (SQLException e) {
+				} catch (GdmException e) {
 					Test_Point[xx][1]="FAULT";
 				}
 			}
@@ -2519,7 +2518,7 @@ public class XmlExecutor extends Applet implements Runnable {
 			   try {
 					Thread.currentThread().sleep(3000);
 				} catch (InterruptedException e1) {
-					
+
 					e1.printStackTrace();
 				}
 			   /*
@@ -2542,24 +2541,23 @@ public class XmlExecutor extends Applet implements Runnable {
 				String strPwd = element.elementText("PWD").trim();
 				String strDb = element.elementText("DATABASE").trim();
 				try {
-					Connection conn = DriverManager.getConnection("jdbc:dm://" + curServer + ":" + curPort + "/"
-							+ strDb, strUid, strPwd);
+					GdmConnection conn = ConnectionContext.getConnection("usertable");
 					transConnList.add(conn);
 					DbOperator dbOperator = new DbOperator(conn);
 					trans[3].setDbOperator(dbOperator);
-				} catch (SQLException e) {
+				} catch (GdmException e) {
 					Test_Point[xx][1]="FAULT";
 				}
 			}
 			trans[3].setElement(element);
-			
+
 			   synchronized(trans[3].WaitTrans[3]){
 				trans[3].WaitTrans[3].notify();
 				}
 			   try {
 					Thread.currentThread().sleep(3000);
 				} catch (InterruptedException e1) {
-					
+
 					e1.printStackTrace();
 				}
 			   /*
@@ -2582,24 +2580,23 @@ public class XmlExecutor extends Applet implements Runnable {
 				String strPwd = element.elementText("PWD").trim();
 				String strDb = element.elementText("DATABASE").trim();
 				try {
-					Connection conn = DriverManager.getConnection("jdbc:dm://" + curServer + ":" + curPort + "/"
-							+ strDb, strUid, strPwd);
+					GdmConnection conn = ConnectionContext.getConnection("usertable");
 					transConnList.add(conn);
 					DbOperator dbOperator = new DbOperator(conn);
 					trans[4].setDbOperator(dbOperator);
-				} catch (SQLException e) {
+				} catch (GdmException e) {
 					Test_Point[xx][1]="FAULT";
 				}
 			}
 			trans[4].setElement(element);
-			
+
 			   synchronized(trans[4].WaitTrans[4]){
 				trans[4].WaitTrans[4].notify();
 				}
 			   try {
 					Thread.currentThread().sleep(3000);
 				} catch (InterruptedException e1) {
-					
+
 					e1.printStackTrace();
 				}
 			   /*
@@ -2622,24 +2619,23 @@ public class XmlExecutor extends Applet implements Runnable {
 				String strPwd = element.elementText("PWD").trim();
 				String strDb = element.elementText("DATABASE").trim();
 				try {
-					Connection conn = DriverManager.getConnection("jdbc:dm://" + curServer + ":" + curPort + "/"
-							+ strDb, strUid, strPwd);
+					GdmConnection conn = ConnectionContext.getConnection("usertable");
 					transConnList.add(conn);
 					DbOperator dbOperator = new DbOperator(conn);
 					trans[5].setDbOperator(dbOperator);
-				} catch (SQLException e) {
+				} catch (GdmException e) {
 					Test_Point[xx][1]="FAULT";
 				}
 			}
 			trans[5].setElement(element);
-			
+
 			   synchronized(trans[5].WaitTrans[5]){
 				trans[5].WaitTrans[5].notify();
 				}
 			   try {
 					Thread.currentThread().sleep(3000);
 				} catch (InterruptedException e1) {
-					
+
 					e1.printStackTrace();
 				}
 			   /*
@@ -2662,24 +2658,23 @@ public class XmlExecutor extends Applet implements Runnable {
 				String strPwd = element.elementText("PWD").trim();
 				String strDb = element.elementText("DATABASE").trim();
 				try {
-					Connection conn = DriverManager.getConnection("jdbc:dm://" + curServer + ":" + curPort + "/"
-							+ strDb, strUid, strPwd);
+					GdmConnection conn = ConnectionContext.getConnection("usertable");
 					transConnList.add(conn);
 					DbOperator dbOperator = new DbOperator(conn);
 					trans[6].setDbOperator(dbOperator);
-				} catch (SQLException e) {
+				} catch (GdmException e) {
 					Test_Point[xx][1]="FAULT";
 				}
 			}
 			trans[6].setElement(element);
-			
+
 			   synchronized(trans[6].WaitTrans[6]){
 				trans[6].WaitTrans[6].notify();
 				}
 			   try {
 					Thread.currentThread().sleep(3000);
 				} catch (InterruptedException e1) {
-					
+
 					e1.printStackTrace();
 				}
 			   /*
@@ -2701,12 +2696,11 @@ public class XmlExecutor extends Applet implements Runnable {
 				String strPwd = element.elementText("PWD").trim();
 				String strDb = element.elementText("DATABASE").trim();
 				try {
-					Connection conn = DriverManager.getConnection("jdbc:dm://" + curServer + ":" + curPort + "/"
-							+ strDb, strUid, strPwd);
+					GdmConnection conn = ConnectionContext.getConnection("usertable");
 					transConnList.add(conn);
 					DbOperator dbOperator = new DbOperator(conn);
 					trans[7].setDbOperator(dbOperator);
-				} catch (SQLException e) {
+				} catch (GdmException e) {
 					Test_Point[xx][1]="FAULT";
 				}
 			}
@@ -2717,7 +2711,7 @@ public class XmlExecutor extends Applet implements Runnable {
 			   try {
 					Thread.currentThread().sleep(3000);
 				} catch (InterruptedException e1) {
-					
+
 					e1.printStackTrace();
 				}
 			if(!trans[7].getreault())
@@ -2741,7 +2735,7 @@ public class XmlExecutor extends Applet implements Runnable {
 			}
 			return true;
 		}
-		
+
 		public boolean LINUX(Element element){
 			if(isLinuxOs==true){
 				return ExecuteElement(element);
@@ -2763,7 +2757,7 @@ public class XmlExecutor extends Applet implements Runnable {
 				usedtime=((double)(System.nanoTime()-starttime))/1000000;
 				System.out.println("--sql:"+"\r"+ sql+"\n--影响了"+effectRows+"行");
 				System.out.println("--耗费了"+usedtime+"ms");
-			} catch (SQLException e) {
+			} catch (GdmException e) {
 				//2010-12-22-YJM等待服务器重启
 				boolean flag = false;
 				if(e.getMessage().equals("网络通信异常")) {
@@ -2782,9 +2776,9 @@ public class XmlExecutor extends Applet implements Runnable {
 					}
 					if(flag) {
 						try {
-							myConn = DriverManager.getConnection(curURL,curUid,curPwd);
+							myConn = ConnectionContext.getConnection("usertable");
 							dbOperator.setConn(myConn);
-						} catch (SQLException e1) {
+						} catch (GdmException e1) {
 							// TODO Auto-generated catch block
 							e1.printStackTrace();
 						}

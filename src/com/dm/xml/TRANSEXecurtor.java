@@ -20,6 +20,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import com.dm.connect.ConnectionContext;
+import com.gdm.driver.GdmConnection;
+import com.gdm.driver.GdmException;
 import org.dom4j.Element;
 
 import com.dm.common.InetOperator;
@@ -104,7 +107,7 @@ public class TRANSEXecurtor extends XmlExecutor {
 						for(int i=0;i<mapsize;i++){
 							try {
 								myConnMap.get(i).close();
-							} catch (SQLException e) {
+							} catch (GdmException e) {
 								Test_Point[xx][1]="FAULT";
 								//System.out.println("DISCONNECT所有失败");
 							}
@@ -113,7 +116,7 @@ public class TRANSEXecurtor extends XmlExecutor {
 					else{
 						try {
 							myConnMap.get(cId).close();
-							} catch (SQLException e) {
+							} catch (GdmException e) {
 								Test_Point[xx][1]="FAULT";
 								//mlog.error("DISCONNECT失败");
 								return false;
@@ -127,7 +130,7 @@ public class TRANSEXecurtor extends XmlExecutor {
 					if(curConnId == CURCONNID) {
 						try {
 							dbOperator.close();
-						} catch (SQLException e) {
+						} catch (GdmException e) {
 							Test_Point[xx][1]="FAULT";
 							//mlog.error("DISCONNECT失败");
 							return false;
@@ -142,7 +145,7 @@ public class TRANSEXecurtor extends XmlExecutor {
 							if(myConnMap.get(curConnId)!= null) {
 								myConnMap.get(curConnId).close();
 							}
-						} catch (SQLException e) {
+						} catch (GdmException e) {
 							Test_Point[xx][1]="FAULT";
 							//mlog.error("DISCONNECT失败");
 							return false;
@@ -158,7 +161,7 @@ public class TRANSEXecurtor extends XmlExecutor {
 			public boolean newConnect()  {
 				String dbUrl = "jdbc:dm://" + curServer + ":" + curPort + "/"+ curDatabase;
 				try {
-					Connection conn=DriverManager.getConnection(dbUrl,curUid,curPwd);
+					GdmConnection conn = ConnectionContext.getConnection("usertable");
 					//MyConnection newConn = AutoTest.connManager.getConnection(dbUrl, curUid, curPwd);
 					MyConnection newConn=new MyConnection(conn);	
 					//MyConnectionPool pool=new MyConnectionPool(dbUrl,curUid,curPwd);
@@ -172,7 +175,7 @@ public class TRANSEXecurtor extends XmlExecutor {
 					if(connectId==-1)
 						otherConnList.add(newConn);
 					return true;
-				} catch (SQLException e) {
+				} catch (GdmException e) {
 					Test_Point[xx][1]="FAULT";
 					//mlog.errorConn("新建连接时失败\r\n" + e.getMessage(), curServer,curPort, curDatabase, curUid, curPwd);
 					return false;
@@ -472,7 +475,7 @@ public class TRANSEXecurtor extends XmlExecutor {
 				case DIRECT_EXECUTE_SUCCESS:
 					try {
 							effectRows = dbOperator.DirectExecute(sql);
-						} catch (SQLException e) {
+						} catch (GdmException e) {
 							//2010-12-22-YJM等待服务器重启
 							boolean flag = false;
 							if(e.getMessage().equals("网络通信异常")) {
@@ -491,9 +494,9 @@ public class TRANSEXecurtor extends XmlExecutor {
 								}
 								if(flag) {
 									try {
-										myConn = DriverManager.getConnection(curURL,curUid,curPwd);
+										myConn =  ConnectionContext.getConnection("usertable");
 										dbOperator.setConn(myConn);
-									} catch (SQLException e1) {
+									} catch (GdmException e1) {
 										// TODO Auto-generated catch block
 										e1.printStackTrace();
 									}
@@ -597,7 +600,7 @@ public class TRANSEXecurtor extends XmlExecutor {
 								//mlog.error("执行SQL语句失败（预期执行失败，实际执行成功）：\r\n\t"+sql+"\r\n\t");
 							}
 							return false;
-						} catch (SQLException e) {
+						} catch (GdmException e) {
 	//						//2010-12-22-YJM等待服务器重启
 							boolean flag = false;
 							if(e.getMessage().equals("网络通信异常")) {
@@ -616,9 +619,9 @@ public class TRANSEXecurtor extends XmlExecutor {
 								}
 								if(flag) {
 									try {
-										myConn = DriverManager.getConnection(curURL,curUid,curPwd);
+										myConn = ConnectionContext.getConnection("usertable");
 										dbOperator.setConn(myConn);
-									} catch (SQLException e1) {
+									} catch (GdmException e1) {
 										// TODO Auto-generated catch block
 										e1.printStackTrace();
 									}
@@ -631,7 +634,7 @@ public class TRANSEXecurtor extends XmlExecutor {
 				case DIRECT_EXECUTE_IGNORE:
 					try {
 							dbOperator.DirectExecute(sql);
-						} catch (SQLException e) {
+						} catch (GdmException e) {
 	//						//2010-12-22-YJM等待服务器重启
 							boolean flag = false;
 							if(e.getMessage().equals("网络通信异常")) {
@@ -650,9 +653,9 @@ public class TRANSEXecurtor extends XmlExecutor {
 								}
 								if(flag) {
 									try {
-										myConn = DriverManager.getConnection(curURL,curUid,curPwd);
+										myConn = ConnectionContext.getConnection("usertable");
 										dbOperator.setConn(myConn);
-									} catch (SQLException e1) {
+									} catch (GdmException e1) {
 										// TODO Auto-generated catch block
 										e1.printStackTrace();
 									}
@@ -666,9 +669,9 @@ public class TRANSEXecurtor extends XmlExecutor {
 	//			case DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL:
 	//			case DIRECT_EXECUTE_SELECT_WITH_RESULT:
 				default: try {
-							sqlResult = null;
-							sqlResult = dbOperator.ExecuteQuery(sql);
-						} catch (SQLException e) {
+//							sqlResult = null;
+//							sqlResult = dbOperator.ExecuteQuery(sql);
+						} catch (GdmException e) {
 							//2010-12-22-YJM等待服务器重启
 							boolean flag = false;
 							if(e.getMessage().equals("网络通信异常")) {
@@ -687,9 +690,9 @@ public class TRANSEXecurtor extends XmlExecutor {
 								}
 								if(flag) {
 									try {
-										myConn = DriverManager.getConnection(curURL,curUid,curPwd);
+										myConn = ConnectionContext.getConnection("usertable");
 										dbOperator = new DbOperator(myConn);
-									} catch (SQLException e1) {
+									} catch (GdmException e1) {
 										// TODO Auto-generated catch block
 										e1.printStackTrace();
 									}
@@ -798,7 +801,7 @@ public class TRANSEXecurtor extends XmlExecutor {
 					try {
 						ifIsTrue = dbOperator.DirectExecute(sql) == 1 ? true
 								: false;
-					} catch (SQLException e) {
+					} catch (GdmException e) {
 						Test_Point[xx][1]="FAULT";
 						//mlog.error("IF节点表达式求值错误："+str);
 	//					e.printStackTrace();
@@ -808,7 +811,7 @@ public class TRANSEXecurtor extends XmlExecutor {
 					str = replaceStr(str);
 					try {
 						ifIsTrue = dbOperator.DirectExecute(str)==1?true:false;
-					} catch (SQLException e) {
+					} catch (GdmException e) {
 						// 执行错误认为IF条件为假
 						ifIsTrue = false;
 						Test_Point[xx][1]="FAULT";
@@ -821,7 +824,7 @@ public class TRANSEXecurtor extends XmlExecutor {
 					try {
 						ifIsTrue = dbOperator.DirectExecute(sql) == 1 ? true
 								: false;
-					} catch (SQLException e) {
+					} catch (GdmException e) {
 						Test_Point[xx][1]="FAULT";
 						//mlog.error("IF节点表达式求值错误："+str);
 	//					e.printStackTrace();
@@ -843,8 +846,8 @@ public class TRANSEXecurtor extends XmlExecutor {
 				if(str.startsWith("FromSql:")){
 					str = str.substring("FromSql:".length());
 					try {
-						str = dbOperator.getExp(str);
-					} catch (SQLException e) {
+//						str = dbOperator.getExp(str);
+					} catch (GdmException e) {
 	//					e.printStackTrace();
 					}
 				}
@@ -888,8 +891,8 @@ public class TRANSEXecurtor extends XmlExecutor {
 				if(str.startsWith("FromSql:")){
 					str = str.substring("FromSql:".length());
 					try {
-						str = dbOperator.getExp(str);
-					} catch (SQLException e) {
+//						str = dbOperator.getExp(str);
+					} catch (GdmException e) {
 	//					e.printStackTrace();
 					}
 					if (str == null || str.equals("")) {
@@ -929,8 +932,8 @@ public class TRANSEXecurtor extends XmlExecutor {
 				if(str.startsWith("FromSql:")){
 					str = str.substring("FromSql:".length());
 					try {
-						str = dbOperator.getExp(str);
-					} catch (SQLException e) {
+//						str = dbOperator.getExp(str);
+					} catch (GdmException e) {
 	//					e.printStackTrace();
 					}
 					if (str == null || str.equals("")) {
@@ -970,8 +973,8 @@ public class TRANSEXecurtor extends XmlExecutor {
 				if(str.startsWith("FromSql:")){
 					str = str.substring("FromSql:".length());
 					try {
-						str = dbOperator.getExp(str);
-					} catch (SQLException e) {
+//						str = dbOperator.getExp(str);
+					} catch (GdmException e) {
 	//					e.printStackTrace();
 					}
 					if (str == null || str.equals("")) {
@@ -1161,13 +1164,13 @@ public class TRANSEXecurtor extends XmlExecutor {
 				String temp;
 				int tempInt = 0;
 				try {
-					temp = dbOperator.getExp("SELECT "+expStr);
-					int tempDot = temp.indexOf('.');
-					if(tempDot!=-1){
-						temp = temp.substring(0,tempDot);
-					}
-					tempInt = Integer.valueOf(temp);
-				} catch (SQLException e) {
+//					temp = dbOperator.getExp("SELECT "+expStr);
+//					int tempDot = temp.indexOf('.');
+//					if(tempDot!=-1){
+//						temp = temp.substring(0,tempDot);
+//					}
+//					tempInt = Integer.valueOf(temp);
+				} catch (GdmException e) {
 					Test_Point[xx][1]="FAULT";
 					//mlog.error("EXP计算错误");
 					return -1;
@@ -1189,7 +1192,7 @@ public class TRANSEXecurtor extends XmlExecutor {
 				isMoreThread = true;
 				String THREADS = element.elementText("THREADS");
 				String TIMES = element.elementText("TIMES");
-				Connection oldConn = dbOperator.getConn();
+				GdmConnection oldConn = dbOperator.getConn();
 				if(THREADS==null){
 					/*
 					 * 2010-11-19-YJM
@@ -1264,9 +1267,7 @@ public class TRANSEXecurtor extends XmlExecutor {
 					 * 考虑MORETHREAD节点里有CONNECT，且CONNECT节点里有值的情况
 					 */
 					try {
-						newConn = AutoTest.connManager.getConnection("jdbc:dm://"
-								+ curServer + ":" + curPort + "/" + strDb,
-								strUid, strPwd);
+						newConn = AutoTest.connManager.getConnection("usertable");
 						dbOperator.setConn(newConn);
 						if(curId != null && !(curId.equals(""))) {
 							if(0==myConnMapSize){							// 还没有任何连接信息，默认用工具设置的连接信息
@@ -1275,7 +1276,7 @@ public class TRANSEXecurtor extends XmlExecutor {
 							if(connectId!=-1)
 								myConnMap.put(connectId, newConn);
 						}
-					} catch (SQLException e) {
+					} catch (GdmException e) {
 						/*
 						 * 2010-11-19-YJM
 						 * 处理TYPE为LOGIN_FAIL的情况
@@ -1312,7 +1313,7 @@ public class TRANSEXecurtor extends XmlExecutor {
 							newConn.close();
 						}
 						dbOperator.setConn(oldConn);
-					} catch (SQLException e) {
+					} catch (GdmException e) {
 	//						e.printStackTrace();
 					}
 					isMoreThread = false;
@@ -1368,7 +1369,7 @@ public class TRANSEXecurtor extends XmlExecutor {
 					curType = getType(str.trim());
 				}
 				
-				Connection oldConn = dbOperator.getConn();
+				GdmConnection oldConn = dbOperator.getConn();
 				isNewConnectExecute = true;
 				// 2010-3-19 添加trim()
 				String tempUid = element.elementText("UID");
@@ -1417,8 +1418,7 @@ public class TRANSEXecurtor extends XmlExecutor {
 				 * 考虑MORETHREAD节点里有CONNECT，且CONNECT节点里有值的情况
 				 */
 				try {
-					Connection Conn = AutoTest.connManager.getConnection("jdbc:dm://"
-							+ curServer + ":" + curPort + "/" + tempDatabase,tempUid, tempPwd);
+					GdmConnection Conn = AutoTest.connManager.getConnection("usertable");
 					newConn=new MyConnection(Conn);
 					dbOperator.setConn(newConn);
 					if(curId != null && !(curId.equals(""))) {
@@ -1431,7 +1431,7 @@ public class TRANSEXecurtor extends XmlExecutor {
 					
 					ExecuteElement(element);
 					
-					} catch (SQLException e) {
+					} catch (GdmException e) {
 						/*
 						 * 2010-11-19-YJM
 						 * 处理TYPE为LOGIN_FAIL的情况
@@ -1460,7 +1460,7 @@ public class TRANSEXecurtor extends XmlExecutor {
 					if(null != newConn) {
 						newConn.close();
 					}
-				} catch (SQLException e) {
+				} catch (GdmException e) {
 					e.printStackTrace();
 				}
 				//2011-3-25 BUG修改：避免释放资源缓慢，造成数据库对象被占用
@@ -1477,8 +1477,8 @@ public class TRANSEXecurtor extends XmlExecutor {
 			public boolean OPEN(Element element){
 				try {
 					// 再执行一遍刚才的SQL语句 记录结果集
-					sqlResult = dbOperator.ExecuteQuery(curSql);
-				} catch (SQLException e) {
+//					sqlResult = dbOperator.ExecuteQuery(curSql);
+				} catch (GdmException e) {
 	//				e.printStackTrace();
 				}
 					ExecuteElement(element);
@@ -1596,7 +1596,7 @@ public class TRANSEXecurtor extends XmlExecutor {
 					dbOperator.closeAutoCommit();
 					dbOperator.DirectExecute("commit");
 					//dbOperator.openAutoCommit();
-				} catch (SQLException e) {
+				} catch (GdmException e) {
 					//mlog.error("设定非自动提交属性失败");
 					System.out.println("设定非自动提交属性失败");
 					Test_Point[xx][1]="FAULT";
@@ -1609,7 +1609,7 @@ public class TRANSEXecurtor extends XmlExecutor {
 				}else if(str.toLowerCase().equals("readcommitted")){
 					try {
 						dbOperator.DirectExecute("SET TRANSACTION ISOLATION LEVEL READ COMMITTED");
-					} catch (SQLException e) {
+					} catch (GdmException e) {
 						System.out.println("设定事务隔离级读提交失败");
 						Test_Point[xx][1]="FAULT";
 						//e.printStackTrace();
@@ -1617,7 +1617,7 @@ public class TRANSEXecurtor extends XmlExecutor {
 				}else if(str.toLowerCase().equals("readuncommitted")){
 					try {
 						dbOperator.DirectExecute("SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED");
-					} catch (SQLException e) {
+					} catch (GdmException e) {
 						System.out.println("设定事务隔离级脏读失败");
 						Test_Point[xx][1]="FAULT";
 						//e.printStackTrace();
@@ -1625,7 +1625,7 @@ public class TRANSEXecurtor extends XmlExecutor {
 				}else if(str.toLowerCase().equals("serializable")){
 					try {
 						dbOperator.DirectExecute("SET TRANSACTION ISOLATION LEVEL SERIALIZABLE");
-					} catch (SQLException e) {
+					} catch (GdmException e) {
 						System.out.println("设定事务隔离级可串行化失败");
 						Test_Point[xx][1]="FAULT";
 						//e.printStackTrace();
@@ -1633,7 +1633,7 @@ public class TRANSEXecurtor extends XmlExecutor {
 				}else if(str.toLowerCase().equals("repeatableread")){
 					try {
 						dbOperator.DirectExecute("SET TRANSACTION ISOLATION LEVEL REPEATABLE READ");
-					} catch (SQLException e) {
+					} catch (GdmException e) {
 						System.out.println("设定事务隔离级可重复读失败");
 						Test_Point[xx][1]="FAULT";
 						//e.printStackTrace();
@@ -1664,7 +1664,7 @@ public class TRANSEXecurtor extends XmlExecutor {
 						//mlog.error("ENDTRANS节点关键字错误：" + str);
 						return false;
 					}
-				} catch (SQLException e) {
+				} catch (GdmException e) {
 					Test_Point[xx][1]="FAULT";
 					System.out.println(str+"错误");
 					//mlog.error(str+"错误");
@@ -1673,7 +1673,7 @@ public class TRANSEXecurtor extends XmlExecutor {
 				
 				try {
 					dbOperator.openAutoCommit();
-				} catch (SQLException e) {
+				} catch (GdmException e) {
 					Test_Point[xx][1]="FAULT";
 					//mlog.error("关闭自动提交属性失败");
 	//				e.printStackTrace();
@@ -1815,7 +1815,7 @@ public class TRANSEXecurtor extends XmlExecutor {
 						//mlog.error("结果集比较错误XML："+str+"实际："+count);
 						return false;
 					}
-				} catch (SQLException e) {
+				} catch (GdmException e) {
 					//2010-12-22-YJM等待服务器重启
 					boolean flag = false;
 					if(e.getMessage().equals("网络通信异常")) {
@@ -1834,9 +1834,9 @@ public class TRANSEXecurtor extends XmlExecutor {
 						}
 						if(flag) {
 							try {
-								myConn = DriverManager.getConnection(curURL,curUid,curPwd);
+								myConn = ConnectionContext.getConnection("usertable");
 								dbOperator = new DbOperator(myConn);
-							} catch (SQLException e1) {
+							} catch (GdmException e1) {
 								// TODO Auto-generated catch block
 								e1.printStackTrace();
 							}
@@ -1859,16 +1859,17 @@ public class TRANSEXecurtor extends XmlExecutor {
 					}
 				
 				try {
-					Connection conn = DriverManager.getConnection("jdbc:dm://" + curServer + ":" + curPort + "/"
-									+ curDatabase, curUid, curPwd);
+					GdmConnection conn = AutoTest.connManager.getConnection("usertable");
 					transConnList.add(conn);
 					DbOperator dbOperator = new DbOperator(conn);
 					trans[transCount]=new TRANSEXecurtor(dbOperator,true);
 					transthread[transCount]=new Thread(trans[transCount]);
-				} catch (SQLException e) {
+				} catch (GdmException e) {
 					Test_Point[xx][1]="FAULT";
 					System.out.println("NEWTRANS中申请连接失败");
 					//mlog.error("NEWTRANS中申请连接失败");
+					e.printStackTrace();
+				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
 				trans[transCount].waitnum=transCount;
@@ -1888,13 +1889,14 @@ public class TRANSEXecurtor extends XmlExecutor {
 					String strPwd = element.elementText("PWD").trim();
 					String strDb = element.elementText("DATABASE").trim();
 					try {
-						Connection conn = DriverManager.getConnection("jdbc:dm://" + curServer + ":" + curPort + "/"
-								+ strDb, strUid, strPwd);
+						GdmConnection conn = AutoTest.connManager.getConnection("usertable");
 						transConnList.add(conn);
 						DbOperator dbOperator = new DbOperator(conn);
 						trans[0].setDbOperator(dbOperator);
-					} catch (SQLException e) {
+					} catch (GdmException e) {
 						Test_Point[xx][1]="FAULT";
+					} catch (InterruptedException e) {
+						e.printStackTrace();
 					}
 				}
 				trans[0].setElement(element);
@@ -1919,13 +1921,14 @@ public class TRANSEXecurtor extends XmlExecutor {
 					String strPwd = element.elementText("PWD").trim();
 					String strDb = element.elementText("DATABASE").trim();
 					try {
-						Connection conn = DriverManager.getConnection("jdbc:dm://" + curServer + ":" + curPort + "/"
-								+ strDb, strUid, strPwd);
+						GdmConnection conn = AutoTest.connManager.getConnection("usertable");
 						transConnList.add(conn);
 						DbOperator dbOperator = new DbOperator(conn);
 						trans[1].setDbOperator(dbOperator);
-					} catch (SQLException e) {
+					} catch (GdmException e) {
 						Test_Point[xx][1]="FAULT";
+					} catch (InterruptedException e) {
+						e.printStackTrace();
 					}
 				}
 				trans[1].setElement(element);
@@ -1958,13 +1961,14 @@ public class TRANSEXecurtor extends XmlExecutor {
 					String strPwd = element.elementText("PWD").trim();
 					String strDb = element.elementText("DATABASE").trim();
 					try {
-						Connection conn = DriverManager.getConnection("jdbc:dm://" + curServer + ":" + curPort + "/"
-								+ strDb, strUid, strPwd);
+						GdmConnection conn = AutoTest.connManager.getConnection("usertable");
 						transConnList.add(conn);
 						DbOperator dbOperator = new DbOperator(conn);
 						trans[2].setDbOperator(dbOperator);
-					} catch (SQLException e) {
+					} catch (GdmException e) {
 						Test_Point[xx][1]="FAULT";
+					} catch (InterruptedException e) {
+						e.printStackTrace();
 					}
 				}
 				trans[2].setElement(element);
@@ -1997,13 +2001,14 @@ public class TRANSEXecurtor extends XmlExecutor {
 					String strPwd = element.elementText("PWD").trim();
 					String strDb = element.elementText("DATABASE").trim();
 					try {
-						Connection conn = DriverManager.getConnection("jdbc:dm://" + curServer + ":" + curPort + "/"
-								+ strDb, strUid, strPwd);
+						GdmConnection conn = AutoTest.connManager.getConnection("usertable");
 						transConnList.add(conn);
 						DbOperator dbOperator = new DbOperator(conn);
 						trans[3].setDbOperator(dbOperator);
-					} catch (SQLException e) {
+					} catch (GdmException e) {
 						Test_Point[xx][1]="FAULT";
+					} catch (InterruptedException e) {
+						e.printStackTrace();
 					}
 				}
 				trans[3].setElement(element);
@@ -2037,13 +2042,14 @@ public class TRANSEXecurtor extends XmlExecutor {
 					String strPwd = element.elementText("PWD").trim();
 					String strDb = element.elementText("DATABASE").trim();
 					try {
-						Connection conn = DriverManager.getConnection("jdbc:dm://" + curServer + ":" + curPort + "/"
-								+ strDb, strUid, strPwd);
+						GdmConnection conn = AutoTest.connManager.getConnection("usertable");
 						transConnList.add(conn);
 						DbOperator dbOperator = new DbOperator(conn);
 						trans[4].setDbOperator(dbOperator);
-					} catch (SQLException e) {
+					} catch (GdmException e) {
 						Test_Point[xx][1]="FAULT";
+					} catch (InterruptedException e) {
+						e.printStackTrace();
 					}
 				}
 				trans[4].setElement(element);
@@ -2077,13 +2083,14 @@ public class TRANSEXecurtor extends XmlExecutor {
 					String strPwd = element.elementText("PWD").trim();
 					String strDb = element.elementText("DATABASE").trim();
 					try {
-						Connection conn = DriverManager.getConnection("jdbc:dm://" + curServer + ":" + curPort + "/"
-								+ strDb, strUid, strPwd);
+						GdmConnection conn = AutoTest.connManager.getConnection("usertable");
 						transConnList.add(conn);
 						DbOperator dbOperator = new DbOperator(conn);
 						trans[5].setDbOperator(dbOperator);
-					} catch (SQLException e) {
+					} catch (GdmException e) {
 						Test_Point[xx][1]="FAULT";
+					} catch (InterruptedException e) {
+						e.printStackTrace();
 					}
 				}
 				trans[5].setElement(element);
@@ -2117,13 +2124,14 @@ public class TRANSEXecurtor extends XmlExecutor {
 					String strPwd = element.elementText("PWD").trim();
 					String strDb = element.elementText("DATABASE").trim();
 					try {
-						Connection conn = DriverManager.getConnection("jdbc:dm://" + curServer + ":" + curPort + "/"
-								+ strDb, strUid, strPwd);
+						GdmConnection conn = AutoTest.connManager.getConnection("usertable");
 						transConnList.add(conn);
 						DbOperator dbOperator = new DbOperator(conn);
 						trans[6].setDbOperator(dbOperator);
-					} catch (SQLException e) {
+					} catch (GdmException e) {
 						Test_Point[xx][1]="FAULT";
+					} catch (InterruptedException e) {
+						e.printStackTrace();
 					}
 				}
 				trans[6].setElement(element);
@@ -2156,13 +2164,14 @@ public class TRANSEXecurtor extends XmlExecutor {
 					String strPwd = element.elementText("PWD").trim();
 					String strDb = element.elementText("DATABASE").trim();
 					try {
-						Connection conn = DriverManager.getConnection("jdbc:dm://" + curServer + ":" + curPort + "/"
-								+ strDb, strUid, strPwd);
+						GdmConnection conn = AutoTest.connManager.getConnection("usertable");
 						transConnList.add(conn);
 						DbOperator dbOperator = new DbOperator(conn);
 						trans[7].setDbOperator(dbOperator);
-					} catch (SQLException e) {
+					} catch (GdmException e) {
 						Test_Point[xx][1]="FAULT";
+					} catch (InterruptedException e) {
+						e.printStackTrace();
 					}
 				}
 				trans[7].setElement(element);
@@ -2370,7 +2379,7 @@ public class TRANSEXecurtor extends XmlExecutor {
     public void init(){
     	mapForChange = new HashMap<String, String>();
     	otherConnList = new ArrayList<MyConnection>();
-    	transConnList= new ArrayList<Connection>();
+    	transConnList= new ArrayList<>();
 		loopCount = 0;
 		sqlResult=null;
 		effectRows=0;
