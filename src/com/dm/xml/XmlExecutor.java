@@ -10,9 +10,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -231,7 +228,7 @@ public class XmlExecutor extends Applet implements Runnable {
 			try {
 				dbOperator.setConn(Conn1);
 //				dbOperator.DirectExecute("commit");
-				dbOperator.openAutoCommit();
+//				dbOperator.openAutoCommit();
 			} catch (GdmException e1) {
 				// TODO Auto-generated catch block
 				//2010-12-22-YJM等待服务器重启
@@ -354,7 +351,7 @@ public class XmlExecutor extends Applet implements Runnable {
 	public void connFree(){
 		int i=0;
 		int listLen = otherConnList.size();
-	    myConn = myConnMap.get(i);
+//	    myConn = myConnMap.get(i);
 		while(myConn!=null){
 			try {
 				myConn.close();
@@ -364,7 +361,7 @@ public class XmlExecutor extends Applet implements Runnable {
 				e.printStackTrace();
 			}
 			i++;
-			myConn = myConnMap.get(i);
+//			myConn = myConnMap.get(i);
 		}
 
 		for(i=0;i<listLen;i++){
@@ -605,7 +602,7 @@ public class XmlExecutor extends Applet implements Runnable {
 				if (connectId > myConnMapSize-1) { 				// 表示要新建连接放入myConnMap
 					return newConnect();
 				}else{											// 表示要直接从myConnMap中取连接
-					dbOperator.setConn(myConnMap.get(connectId));
+//					dbOperator.setConn(myConnMap.get(connectId));
 					return true;
 				}
 			}else{												// 也是要新建连接
@@ -701,7 +698,7 @@ public class XmlExecutor extends Applet implements Runnable {
 				MyConnection newConn=new MyConnection(conn);
 				//MyConnectionPool pool=new MyConnectionPool(dbUrl,curUid,curPwd);
 				//MyConnection newConn = new MyConnection(conn,pool);
-				dbOperator.setConn(newConn);
+				dbOperator.setConn(conn);
 				if(0==myConnMapSize){							// 还没有任何连接信息，默认用工具设置的连接信息
 					myConnMap.put(0, newConn);
 				}
@@ -1814,7 +1811,7 @@ public class XmlExecutor extends Applet implements Runnable {
 				 */
 				try {
 					newConn = AutoTest.connManager.getConnection("usertable");
-					dbOperator.setConn(newConn);
+//					dbOperator.setConn(conn);
 					if(curId != null && !(curId.equals(""))) {
 						if(0==myConnMapSize){							// 还没有任何连接信息，默认用工具设置的连接信息
 							myConnMap.put(0, newConn);
@@ -1964,9 +1961,9 @@ public class XmlExecutor extends Applet implements Runnable {
 			 * 考虑MORETHREAD节点里有CONNECT，且CONNECT节点里有值的情况
 			 */
 			try {
-				GdmConnection Conn = AutoTest.connManager.getConnection("usertable");
+				GdmConnection Conn = (GdmConnection) AutoTest.connManager.getConnection("usertable");
 				newConn=new MyConnection(Conn);
-				dbOperator.setConn(newConn);
+				dbOperator.setConn((GdmConnection) newConn);
 				if(curId != null && !(curId.equals(""))) {
 					if(0==myConnMapSize){							// 还没有任何连接信息，默认用工具设置的连接信息
 						myConnMap.put(0, newConn);
@@ -2092,7 +2089,7 @@ public class XmlExecutor extends Applet implements Runnable {
 
 		public boolean SETCONNECTID(Element element){
 			curConnId = Integer.valueOf(element.getText().trim());
-			myConn = myConnMap.get(curConnId);
+			myConn = (GdmConnection) myConnMap.get(curConnId);
 			dbOperator.setConn(myConn);
 			return true;
 		}

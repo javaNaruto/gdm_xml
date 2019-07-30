@@ -42,7 +42,7 @@ public class DbOperator {
 			if(rs.next()){
 				effectRows = 1;
 			}
-		conn.close();
+//		conn.close();
 		return effectRows;
 	}
 	

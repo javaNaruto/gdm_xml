@@ -37,7 +37,7 @@ import java.util.concurrent.Executor;
  * @author ÍõÎ¡
  *
  */
-public class MyConnection implements GdmConnection {
+public class MyConnection  {
 
     private GdmConnection conn;
 
@@ -54,12 +54,10 @@ public class MyConnection implements GdmConnection {
         this.conn.close();
     }
 
-    @Override
     public List<Map<String, Object>> executeCypher(String s) {
         return null;
     }
 
-    @Override
     public List<Map<String, Object>> executeCypher(String s, Map<String, Object> map) {
         return null;
     }
@@ -73,22 +71,18 @@ public class MyConnection implements GdmConnection {
         this.conn.rollback();
     }
 
-    @Override
     public String getGraph() {
         return null;
     }
 
-    @Override
     public void setGraph(String s) {
 
     }
 
-    @Override
     public GdmResultSet execute(String s) {
         return null;
     }
 
-    @Override
     public GdmResultSet execute(String s, Map<String, Object> map) {
         return null;
     }
@@ -98,7 +92,6 @@ public class MyConnection implements GdmConnection {
         this.conn.setAutoCommit(autoCommit);
     }
 
-    @Override
     public boolean getAutoCommit() {
         return false;
     }

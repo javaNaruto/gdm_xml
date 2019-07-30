@@ -11,9 +11,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -70,7 +67,7 @@ public class TRANSEXecurtor extends XmlExecutor {
 					if (connectId > myConnMapSize-1) { 				// 表示要新建连接放入myConnMap
 						return newConnect();
 					}else{											// 表示要直接从myConnMap中取连接
-						dbOperator.setConn(myConnMap.get(connectId));
+						dbOperator.setConn((GdmConnection) myConnMap.get(connectId));
 						return true;
 					}
 				}else{												// 也是要新建连接
@@ -166,7 +163,7 @@ public class TRANSEXecurtor extends XmlExecutor {
 					MyConnection newConn=new MyConnection(conn);	
 					//MyConnectionPool pool=new MyConnectionPool(dbUrl,curUid,curPwd);
 					//MyConnection newConn = new MyConnection(conn,pool);
-					dbOperator.setConn(newConn);
+					dbOperator.setConn((GdmConnection) newConn);
 					if(0==myConnMapSize){							// 还没有任何连接信息，默认用工具设置的连接信息
 						myConnMap.put(0, newConn);
 					}
@@ -1268,7 +1265,7 @@ public class TRANSEXecurtor extends XmlExecutor {
 					 */
 					try {
 						newConn = AutoTest.connManager.getConnection("usertable");
-						dbOperator.setConn(newConn);
+						dbOperator.setConn((GdmConnection) newConn);
 						if(curId != null && !(curId.equals(""))) {
 							if(0==myConnMapSize){							// 还没有任何连接信息，默认用工具设置的连接信息
 								myConnMap.put(0, newConn);
@@ -1418,9 +1415,9 @@ public class TRANSEXecurtor extends XmlExecutor {
 				 * 考虑MORETHREAD节点里有CONNECT，且CONNECT节点里有值的情况
 				 */
 				try {
-					GdmConnection Conn = AutoTest.connManager.getConnection("usertable");
+					GdmConnection Conn = (GdmConnection) AutoTest.connManager.getConnection("usertable");
 					newConn=new MyConnection(Conn);
-					dbOperator.setConn(newConn);
+					dbOperator.setConn((GdmConnection) newConn);
 					if(curId != null && !(curId.equals(""))) {
 						if(0==myConnMapSize){							// 还没有任何连接信息，默认用工具设置的连接信息
 							myConnMap.put(0, newConn);
@@ -1546,7 +1543,7 @@ public class TRANSEXecurtor extends XmlExecutor {
 			
 			public boolean SETCONNECTID(Element element){
 				curConnId = Integer.valueOf(element.getText().trim());
-				myConn = myConnMap.get(curConnId);
+				myConn = (GdmConnection) myConnMap.get(curConnId);
 				dbOperator.setConn(myConn);
 				return true;
 			}
@@ -1859,7 +1856,7 @@ public class TRANSEXecurtor extends XmlExecutor {
 					}
 				
 				try {
-					GdmConnection conn = AutoTest.connManager.getConnection("usertable");
+					GdmConnection conn = (GdmConnection) AutoTest.connManager.getConnection("usertable");
 					transConnList.add(conn);
 					DbOperator dbOperator = new DbOperator(conn);
 					trans[transCount]=new TRANSEXecurtor(dbOperator,true);
@@ -1889,7 +1886,7 @@ public class TRANSEXecurtor extends XmlExecutor {
 					String strPwd = element.elementText("PWD").trim();
 					String strDb = element.elementText("DATABASE").trim();
 					try {
-						GdmConnection conn = AutoTest.connManager.getConnection("usertable");
+						GdmConnection conn = (GdmConnection) AutoTest.connManager.getConnection("usertable");
 						transConnList.add(conn);
 						DbOperator dbOperator = new DbOperator(conn);
 						trans[0].setDbOperator(dbOperator);
@@ -1921,7 +1918,7 @@ public class TRANSEXecurtor extends XmlExecutor {
 					String strPwd = element.elementText("PWD").trim();
 					String strDb = element.elementText("DATABASE").trim();
 					try {
-						GdmConnection conn = AutoTest.connManager.getConnection("usertable");
+						GdmConnection conn = (GdmConnection) AutoTest.connManager.getConnection("usertable");
 						transConnList.add(conn);
 						DbOperator dbOperator = new DbOperator(conn);
 						trans[1].setDbOperator(dbOperator);
@@ -1961,7 +1958,7 @@ public class TRANSEXecurtor extends XmlExecutor {
 					String strPwd = element.elementText("PWD").trim();
 					String strDb = element.elementText("DATABASE").trim();
 					try {
-						GdmConnection conn = AutoTest.connManager.getConnection("usertable");
+						GdmConnection conn = (GdmConnection) AutoTest.connManager.getConnection("usertable");
 						transConnList.add(conn);
 						DbOperator dbOperator = new DbOperator(conn);
 						trans[2].setDbOperator(dbOperator);
@@ -2001,7 +1998,7 @@ public class TRANSEXecurtor extends XmlExecutor {
 					String strPwd = element.elementText("PWD").trim();
 					String strDb = element.elementText("DATABASE").trim();
 					try {
-						GdmConnection conn = AutoTest.connManager.getConnection("usertable");
+						GdmConnection conn = (GdmConnection) AutoTest.connManager.getConnection("usertable");
 						transConnList.add(conn);
 						DbOperator dbOperator = new DbOperator(conn);
 						trans[3].setDbOperator(dbOperator);
@@ -2042,7 +2039,7 @@ public class TRANSEXecurtor extends XmlExecutor {
 					String strPwd = element.elementText("PWD").trim();
 					String strDb = element.elementText("DATABASE").trim();
 					try {
-						GdmConnection conn = AutoTest.connManager.getConnection("usertable");
+						GdmConnection conn = (GdmConnection) AutoTest.connManager.getConnection("usertable");
 						transConnList.add(conn);
 						DbOperator dbOperator = new DbOperator(conn);
 						trans[4].setDbOperator(dbOperator);
@@ -2083,7 +2080,7 @@ public class TRANSEXecurtor extends XmlExecutor {
 					String strPwd = element.elementText("PWD").trim();
 					String strDb = element.elementText("DATABASE").trim();
 					try {
-						GdmConnection conn = AutoTest.connManager.getConnection("usertable");
+						GdmConnection conn = (GdmConnection) AutoTest.connManager.getConnection("usertable");
 						transConnList.add(conn);
 						DbOperator dbOperator = new DbOperator(conn);
 						trans[5].setDbOperator(dbOperator);
@@ -2124,7 +2121,7 @@ public class TRANSEXecurtor extends XmlExecutor {
 					String strPwd = element.elementText("PWD").trim();
 					String strDb = element.elementText("DATABASE").trim();
 					try {
-						GdmConnection conn = AutoTest.connManager.getConnection("usertable");
+						GdmConnection conn = (GdmConnection) AutoTest.connManager.getConnection("usertable");
 						transConnList.add(conn);
 						DbOperator dbOperator = new DbOperator(conn);
 						trans[6].setDbOperator(dbOperator);
@@ -2164,7 +2161,7 @@ public class TRANSEXecurtor extends XmlExecutor {
 					String strPwd = element.elementText("PWD").trim();
 					String strDb = element.elementText("DATABASE").trim();
 					try {
-						GdmConnection conn = AutoTest.connManager.getConnection("usertable");
+						GdmConnection conn = (GdmConnection) AutoTest.connManager.getConnection("usertable");
 						transConnList.add(conn);
 						DbOperator dbOperator = new DbOperator(conn);
 						trans[7].setDbOperator(dbOperator);
